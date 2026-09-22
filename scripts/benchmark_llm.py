@@ -28,8 +28,8 @@ Design notes
 * **No keys, no crash.** With no API keys set it prints what is missing and
   exits 0. `--list` and `--schemas` work with no keys and no network at all.
 * **Real prompts, real tools.** The system prompt comes from
-  `yen_agent.prompts`; the tool schemas are extracted *from the AST of*
-  `src/yen_agent/tools.py`, so they cannot drift from the agent and importing
+  `resto_agent.prompts`; the tool schemas are extracted *from the AST of*
+  `src/resto_agent/tools.py`, so they cannot drift from the agent and importing
   `livekit-agents` is not required.
 * **Percentiles, not averages.** A model with a fine average and a 3s p90 is
   unusable on a phone — the worst case is what makes a caller hang up.
@@ -66,7 +66,7 @@ except ImportError:  # pragma: no cover - dependency check
     print("httpx is required:  pip install -e .", file=sys.stderr)
     raise SystemExit(1)
 
-TOOLS_PY = ROOT / "src" / "yen_agent" / "tools.py"
+TOOLS_PY = ROOT / "src" / "resto_agent" / "tools.py"
 
 #: Fixed "today" so relative dates ("tomorrow evening") resolve identically on
 #: every run and results stay comparable across days.
@@ -641,7 +641,7 @@ CASES: tuple[Case, ...] = (
 
 
 def build_system_prompt(today: str = BENCH_TODAY, multilingual: bool = True) -> str:
-    from yen_agent.prompts import system_instructions  # noqa: PLC0415 - keeps --help key-free
+    from resto_agent.prompts import system_instructions  # noqa: PLC0415 - keeps --help key-free
 
     return system_instructions(multilingual=multilingual, today=today)
 

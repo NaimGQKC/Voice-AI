@@ -1,7 +1,7 @@
 """Table-assignment engine for the LOCAL FAKE restaurant. Not production.
 
-    ⚠️  THE TABLE LAYOUT BELOW IS INVENTED. It is NOT YEN's real floor plan.
-        Nobody has ever confirmed YEN's table inventory with the owner.
+    ⚠️  THE TABLE LAYOUT BELOW IS INVENTED. It is NOT the venue's real floor plan.
+        Nobody has ever confirmed the venue's table inventory with the owner.
 
     ⚠️  THIS ENGINE NEVER RUNS IN PRODUCTION. The live backend is
         `LibroPrivateReservationService`, and **Libro does its own seating** —
@@ -9,7 +9,7 @@
         Nothing in this file is imported by the live path.
 
 So: the "combined table" behaviour you can see in `scripts/demo.py` proves *our
-engine* works. It does **not** prove anything about how YEN's dining room is
+engine* works. It does **not** prove anything about how the venue's dining room is
 actually run. Don't cite it as evidence about the real restaurant.
 
 Why keep it at all: the test suite needs a backend that can realistically refuse
@@ -56,7 +56,7 @@ class Table:
 
 
 # An intimate ~30-seat room: a few 2-tops and 4-tops that can be combined within
-# their zone, one 6-top, and a 4-seat sushi counter (counter seats never merge).
+# their zone, one 6-top, and a 4-seat counter seating (counter seats never merge).
 FLOOR_PLAN: list[Table] = [
     Table("t_front_1", "Table 1", 2, group="front"),
     Table("t_front_2", "Table 2", 2, group="front"),
@@ -159,8 +159,8 @@ def requires_staff(party_size: int) -> bool:
 # We offer seatings on a 30-min grid up to a "last seating" before close.
 # Monday=0 ... Sunday=6 (datetime.date.weekday()).
 
-EXP_LUNCH = "exp_lunch_yen"
-EXP_DINNER = "exp_dinner_yen"
+EXP_LUNCH = "exp_lunch_demo"
+EXP_DINNER = "exp_dinner_demo"
 
 
 @dataclass(frozen=True)

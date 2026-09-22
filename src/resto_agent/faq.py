@@ -1,26 +1,36 @@
-"""YEN Cuisine Japonaise — knowledge base.
+"""Restaurant knowledge base.
 
-**These are the venue's REAL answers**, recovered from the knowledge base the
-restaurant actually maintains (SadieAI tenant 37487, captured 25 Jul 2026). Do not
-invent or "improve" them — a plausible-sounding wrong answer is worse than no
-answer. If a caller asks something not covered here, the agent must take a message
-rather than guess (see prompts.py).
+**Every value in this file is a placeholder.** The real venue facts — name,
+address, phone, hours and menu detail — are supplied per deployment through the
+``AGENT_RESTAURANT_*`` environment variables read below (see ``.env.example``),
+so no client's details are ever committed to this repository.
+
+The structure is the point: these are the questions a phone agent must answer
+without guessing. Swap the values, keep the shape. If a caller asks something
+not covered here, the agent must take a message rather than invent an answer
+(see prompts.py) — a plausible-sounding wrong answer is worse than none.
 
 French is Québécois register: **always "vous", never "tu"**; "ça" not "cela".
 Bill 96 makes French service a statutory right in Quebec.
 
-Known gap: the venue has never answered its **cancellation/refund policy**, and
-that single blank drove multiple human transfers in their call data. It is the
-top item in docs/YEN_owner_questions.xlsx.
+Known gap in the source data this was modelled on: the venue had never answered
+its **cancellation/refund policy**, and that single blank drove multiple human
+transfers in their call data. It is the top item in docs/owner_questions.xlsx.
 """
 
 from __future__ import annotations
 
-# -- Venue facts (single source of truth) ------------------------------------
-VENUE_NAME = "YEN Cuisine Japonaise"
-ADDRESS = "2157 Rue Mackay, Montréal, QC H3G 2J2"
-PHONE = "514-543-3354"
-TIMEZONE = "America/Toronto"  # their config says America/New_York; same offset
+import os
+
+# -- Venue facts (single source of truth; override via env per deployment) ----
+VENUE_NAME = os.environ.get("AGENT_RESTAURANT_NAME", "{RESTAURANT_NAME}")
+ADDRESS = os.environ.get(
+    "AGENT_RESTAURANT_ADDRESS", "123 Example Street, Montréal, QC H0H 0H0"
+)
+PHONE = os.environ.get("AGENT_RESTAURANT_PHONE", "514-555-0100")
+STREET = os.environ.get("AGENT_RESTAURANT_STREET", "123, rue Example")
+NEAREST_METRO = os.environ.get("AGENT_RESTAURANT_METRO", "Place-d'Armes")
+TIMEZONE = os.environ.get("AGENT_RESTAURANT_TZ", "America/Toronto")
 
 #: Parties above this are arranged by staff. **6 is a Libro API ceiling**, not a
 #: policy: the availability endpoint only ever returns party sizes 1-6, so 7+
@@ -39,25 +49,22 @@ FAQ: dict[str, dict[str, str]] = {
                "14 h 30, et pour le souper tous les soirs de 17 h à 21 h 30."),
     },
     "location": {
-        "en": f"We're at {ADDRESS} — on Mackay, in downtown Montreal.",
-        "fr": "Nous sommes au 2157, rue Mackay, au centre-ville de Montréal.",
+        "en": f"We're at {ADDRESS}, in downtown Montreal.",
+        "fr": f"Nous sommes au {STREET}, au centre-ville de Montréal.",
     },
     "directions": {
         "en": f"We're at {ADDRESS}. I can text you a map link if that helps.",
-        "fr": "Nous sommes au 2157, rue Mackay. Je peux vous envoyer un lien vers la carte par texto.",
+        "fr": f"Nous sommes au {STREET}. Je peux vous envoyer un lien vers la carte par texto.",
     },
     "parking": {
-        "en": ("We're a five-minute walk from Guy-Concordia metro, on the Concordia "
-               "campus. Parking is limited paid street parking from the city."),
-        "fr": ("Nous sommes à cinq minutes de marche du métro Guy-Concordia, sur le "
-               "campus de Concordia. Le stationnement est limité — du stationnement "
-               "de rue payant de la ville."),
+        "en": (f"We're a five-minute walk from {NEAREST_METRO} metro. Parking is "
+               "limited paid street parking from the city."),
+        "fr": (f"Nous sommes à cinq minutes de marche du métro {NEAREST_METRO}. Le "
+               "stationnement est limité — du stationnement de rue payant de la ville."),
     },
     "accessibility": {
-        "en": ("I should mention there are four or five steps going down — our unit "
-               "is in the sub-basement of the building."),
-        "fr": ("Je dois vous mentionner qu'il y a quatre ou cinq marches à descendre — "
-               "notre local est au sous-sol du bâtiment."),
+        "en": ("I should mention there are a few steps down at the entrance."),
+        "fr": ("Je dois vous mentionner qu'il y a quelques marches à descendre à l'entrée."),
     },
     "dietary": {
         "en": ("We do have fish, soy and gluten in our kitchen. We have many "
@@ -71,9 +78,9 @@ FAQ: dict[str, dict[str, str]] = {
                "tout notre possible."),
     },
     "about": {
-        "en": ("We're a chic Japanese bistro with a large and diverse menu — premium "
+        "en": ("We're a chic neighbourhood bistro with a large and diverse menu — premium "
                "ingredients at accessible prices."),
-        "fr": ("Nous sommes un bistro japonais chic avec un menu vaste et varié — des "
+        "fr": ("Nous sommes un bistro de quartier chic avec un menu vaste et varié — des "
                "ingrédients de qualité à prix accessibles."),
     },
     "kids": {
@@ -100,9 +107,9 @@ FAQ: dict[str, dict[str, str]] = {
     },
     "promo": {
         "en": ("We have fifteen percent off take-out plus free delivery with the code "
-               "YEN15 — that's on our website only, on orders over fifty dollars."),
+               "PROMO15 — that's on our website only, on orders over fifty dollars."),
         "fr": ("Nous offrons quinze pour cent de rabais sur les commandes à emporter et "
-               "la livraison gratuite avec le code YEN15 — sur notre site web seulement, "
+               "la livraison gratuite avec le code PROMO15 — sur notre site web seulement, "
                "pour les commandes de plus de cinquante dollars."),
     },
     "happy_hour": {
@@ -110,9 +117,9 @@ FAQ: dict[str, dict[str, str]] = {
         "fr": "Nous n'avons pas de « happy hour ».",
     },
     "menu": {
-        "en": ("We serve Japanese cuisine. Our full menu is on our website — I can text "
+        "en": ("We serve a seasonal à la carte menu. Our full menu is on our website — I can text "
                "you the link."),
-        "fr": ("Nous servons une cuisine japonaise. Notre menu complet est sur notre site "
+        "fr": ("Nous servons un menu à la carte de saison. Notre menu complet est sur notre site "
                "web — je peux vous envoyer le lien par texto."),
     },
     "seasonal_menu": {

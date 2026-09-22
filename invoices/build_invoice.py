@@ -1,8 +1,8 @@
-"""Invoice generator for YEN Cuisine Japonaise work.
+"""Invoice generator for the restaurant work.
 
     python invoices/build_invoice.py            # rebuilds every invoice in INVOICES
 
-Add a new dict to INVOICES and re-run. Numbering is YEN-<year>-<seq>.
+Add a new dict to INVOICES and re-run. Numbering is INV-<year>-<seq>.
 
 `SENDER` and `CLIENT` below are the two parties. Keep the contact address in
 step with the owner setup guide (scripts/build_owner_setup_guide.py) — the
@@ -34,10 +34,10 @@ SENDER = {
 }
 
 CLIENT = {
-    "name": "9503-0425 Quebec Inc.",
-    "lines": ["2157 Rue Mackay",
-              "Montreal, QC  H3G 2J2",
-              "YENcuisinejaponaise1@gmail.com"],
+    "name": "1234-5678 Quebec Inc.",
+    "lines": ["123 Example Street",
+              "Montreal, QC  H0H 0H0",
+              "owner@example.com"],
 }
 
 # Quebec's small-supplier threshold is $30,000 of taxable revenue over four
@@ -50,7 +50,7 @@ TAX_NUMBERS: list[str] = []
 
 INVOICES = [
     {
-        "number": "YEN-2026-001",
+        "number": "INV-2026-001",
         "date": "31 July 2026",
         "status": "PAID",
         "paid_note": "Paid in full. No amount is outstanding &mdash; this document "

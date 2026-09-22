@@ -7,7 +7,7 @@ owner's. If you read one section, read **"The one thing that matters"**.
 
 ## What this is, in one paragraph
 
-A phone agent for **one restaurant** (YEN Cuisine Japonaise, Montreal) that
+A phone agent for **one restaurant** (the restaurant, Montreal) that
 answers calls in French and English, books/cancels/changes reservations in the
 restaurant's real Libro account, answers questions from their real knowledge
 base, and — for everything it *can't* do — captures the caller's details and puts
@@ -120,7 +120,7 @@ Both are **owner questions, already on the spreadsheet** — not Cowork tasks.
   restaurants" is speculative.
 - **Storing call transcripts.** Far more sensitive than a name and number, and
   not needed to operate.
-- **Seating-area preferences** (bar, sushi counter) — Libro does not expose them.
+- **Seating-area preferences** (bar, counter seating) — Libro does not expose them.
 - **Table-merging logic** — Libro owns seating. We do not model the floor.
 - **Any automated path for 7+.** It does not exist in Libro. Human handoff by
   design, not a limitation to engineer around.

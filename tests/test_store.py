@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from yen_agent.concierge import Concierge
-from yen_agent.reservation.mock import MockReservationService
-from yen_agent.store import CallStore
+from resto_agent import faq
+from resto_agent.concierge import Concierge
+from resto_agent.reservation.mock import MockReservationService
+from resto_agent.store import CallStore
 
 
 @pytest.fixture
@@ -71,7 +72,7 @@ async def test_confirmation_is_NOT_spoken_when_the_write_fails(store):
         msg = c.take_message(name="Jordan", phone="514-555-9000", message="party of 14")
         assert "passed your message" not in msg.lower()
         assert "trouble" in msg.lower()
-        assert "514-543-3354" in msg  # gives them a real way to reach a human
+        assert faq.PHONE in msg  # gives them a real way to reach a human
     finally:
         await c.service.aclose()
 
@@ -105,7 +106,7 @@ async def test_successful_delivery_clears_the_pending_queue(store):
 
 async def test_failed_booking_is_recorded_for_the_owner(store):
     """'Check if a reservation was not properly made' — this is that record."""
-    from yen_agent.reservation.errors import SlotUnavailableError
+    from resto_agent.reservation.errors import SlotUnavailableError
 
     c = await _concierge(store)
     try:

@@ -1,4 +1,4 @@
-# YEN Cuisine Japonaise — bilingual voice AI phone agent
+# the restaurant — bilingual voice AI phone agent
 
 A low-cost voice agent that answers the phone for restaurant (I'm not naming my client) and handles reservations — check
 availability, book, look up, reschedule, cancel, answer FAQs, take messages and
@@ -9,14 +9,14 @@ It books into the restaurant's **real Libro account**, which they already own.
 The restaurant keeps the prompts, the logic, and the call records — that is the
 point of the project, not a side effect.
 
-**Status.** It books real tables on YEN's floor in text mode (verified, then
+**Status.** It books real tables on the venue's floor in text mode (verified, then
 cancelled), and it holds a spoken conversation and calls the right tools with the
 right arguments. Those two halves **have not yet been joined** — nobody has
 spoken to it while it wrote to real Libro — and it is **not deployed**: no phone
 number points at it. See [Phased plan](#phased-plan).
 
 > **For the developer:** hand the owner
-> [`docs/YEN_owner_questions.xlsx`](docs/YEN_owner_questions.xlsx) — it collects the
+> [`docs/owner_questions.xlsx`](docs/owner_questions.xlsx) — it collects the
 > remaining policy questions. Hours are confirmed from the venue's live Libro
 > configuration; the rest still runs on realistic placeholders.
 
@@ -27,18 +27,18 @@ no phone number — that is what the test suite and `console` mode use.
 ## The one idea that makes this cheap and safe
 
 Every reservation tool depends only on the `ReservationService` abstraction
-(`src/yen_agent/reservation/base.py`). Two interchangeable implementations:
+(`src/resto_agent/reservation/base.py`). Two interchangeable implementations:
 
 | Implementation | Backend | When |
 |---|---|---|
 | `MockReservationService` | local FastAPI + SQLite (`mock_libro/`) | POC, demos, tests |
-| `LibroPrivateReservationService` | **real YEN reservations** via the Libro dashboard API (token auth) | production ([guide](docs/LIBRO_PRIVATE_INTEGRATION.md)) |
+| `LibroPrivateReservationService` | **real venue reservations** via the Libro dashboard API (token auth) | production ([guide](docs/LIBRO_PRIVATE_INTEGRATION.md)) |
 
 (A third implementation against Libro's official **partner** OAuth API was
 deleted — that route never responded to us, and a stub nobody can exercise is
 just something for the next session to trip over.)
 
-**Swapping mock → real is a config change** (`YEN_RESERVATION_BACKEND=libro-private`).
+**Swapping mock → real is a config change** (`AGENT_RESERVATION_BACKEND=libro-private`).
 The agent and its tools never import HTTP or Libro specifics — each backend keeps
 its own wire-format details in one file.
 
@@ -87,7 +87,7 @@ would say.
 
 > ⚠️ The demo runs against `mock_libro/floorplan.py`, an **invented** floor plan.
 > Table combining and "the room is full" are properties of that mock, **not of
-> YEN's real dining room** — real Libro does its own seating and the live adapter
+> the venue's real dining room** — real Libro does its own seating and the live adapter
 > never returns a merged table. Don't cite the demo as evidence about the venue.
 
 ### 4. Run the actual voice agent
@@ -115,7 +115,7 @@ a phone number for the first test; all have free tiers.
 | 2 | [Deepgram](https://console.deepgram.com) | $200 credit, no card | `DEEPGRAM_API_KEY` (STT; also the fallback voice in `console` mode) |
 | 3 | [Google AI Studio](https://aistudio.google.com/apikey) (Gemini) | free tier | `GOOGLE_API_KEY` |
 
-(Prefer OpenAI for the LLM? set `YEN_LLM_PROVIDER=openai` and `OPENAI_API_KEY` instead.)
+(Prefer OpenAI for the LLM? set `AGENT_LLM_PROVIDER=openai` and `OPENAI_API_KEY` instead.)
 
 **Step by step:**
 
@@ -156,7 +156,7 @@ LiveKit credentials the agent falls back to Deepgram's English voice and logs a
 loud warning, because French read by an English voice is something you want to
 find in a log line rather than on a live call.
 
-> **Model-name note:** the plugin model ids in `src/yen_agent/agent.py` are the
+> **Model-name note:** the plugin model ids in `src/resto_agent/agent.py` are the
 > recommended stack; if a plugin version rejects one, check the provider's
 > current model list and adjust that one line. Model ids are checked against the
 > plugin's own type literals — we shipped an invented one (`cartesia/sonic-3:fr`)
@@ -179,9 +179,9 @@ French-first, each layer swappable via `.env`. Reasoning in
 
 ### Language
 
-`YEN_LANGUAGE_MODE=multi` (the default) gives Nova-3 Multilingual STT and the
-French locale. The greeting is **always French** — *"Bonjour. YEN Cuisine
-Japonaise."* — because two-thirds of this venue's calls are in French. From the
+`AGENT_LANGUAGE_MODE=multi` (the default) gives Nova-3 Multilingual STT and the
+French locale. The greeting is **always French** — *"Bonjour. {RESTAURANT_NAME}."*,
+built from configuration — because two-thirds of this venue's calls are in French. From the
 caller's first words the agent follows whichever language they use, and can
 switch mid-call.
 
@@ -206,8 +206,8 @@ The hard part of restaurant reservations isn't the calendar — it's the **room*
 All of that lives in `mock_libro/floorplan.py` as a deterministic engine (an LLM
 should never do table math), and the agent reasons by *calling* it:
 
-- **Floor plan:** YEN is modeled as an intimate room — a few 2-tops and 4-tops,
-  one 6-top, and a sushi counter (placeholder inventory; confirm with the
+- **Floor plan:** The venue is modeled as an intimate room — a few 2-tops and 4-tops,
+  one 6-top, and a counter seating (placeholder inventory; confirm with the
   restaurant). Tables belong to **combinable groups** that can be pushed together.
 - **Least-waste assignment:** for each request the engine picks the smallest
   single table that fits; if none fits, it **merges** the smallest set of tables
@@ -247,7 +247,7 @@ The things that break voice agents in practice are handled deterministically
 ## Phased plan
 
 - **Phase 1 (this repo):** free, web-tested agent against the mock. ✅
-- **Phase 2 — real reservations:** ✅ **in text mode.** Booking `11189765` was
+- **Phase 2 — real reservations:** ✅ **in text mode.** Booking `<redacted>` was
   created on `api.libroreserve.com` via `scripts/test_booking_libro.py`, dated
   far into the future, then cancelled and verified. **Nobody has yet *spoken* to
   the agent while it wrote to real Libro** — that is `docs/QA_SCRIPT.md` §F and
@@ -256,8 +256,8 @@ The things that break voice agents in practice are handled deterministically
   LiveKit SIP, deploy to Fly. **Not done.** Blocked on accounts, and on enabling
   billing for Gemini — the free tier rate-limited the first live test.
 
-  To point at the real backend, set `YEN_RESERVATION_BACKEND=libro-private`
-  with the YEN Libro token. First run the **read-only probe** to confirm the live
+  To point at the real backend, set `AGENT_RESERVATION_BACKEND=libro-private`
+  with the venue Libro token. First run the **read-only probe** to confirm the live
   API shapes, then a single controlled test booking. Full walkthrough:
   [`docs/LIBRO_PRIVATE_INTEGRATION.md`](docs/LIBRO_PRIVATE_INTEGRATION.md).
 
@@ -274,8 +274,8 @@ The things that break voice agents in practice are handled deterministically
 `scripts/build_client_report.py`, which generates the PDF the owner was quoted
 from — **that script is the source of truth**, not the prose here.
 
-The figure rests on this venue's *measured* volume: **102 calls and 111
-talk-minutes per month**, summed from an 84-call log. Most of the total is fixed
+The figure rests on this venue's *measured* volume: **~100 calls and ~110
+talk-minutes per month**, from their own call log. Most of the total is fixed
 cost (hosting ~$9.80, phone number ~$1.15 + minutes), so it barely moves as calls
 increase. Earlier versions of this file estimated 1,500–2,000 min/month and
 $80–130 — that was an order of magnitude off the real venue.
@@ -291,29 +291,29 @@ against primary sources).
 ```
 mock_libro/            # the "external" Libro service: FastAPI + SQLite JSON:API mock
   app.py               #   endpoints + JSON:API serializers + error codes
-  db.py                #   SQLite store, Yen seed data, table occupancy queries
+  db.py                #   SQLite store, venue seed data, table occupancy queries
   floorplan.py         #   tables, combinable groups, turn times, hours, assignment engine
-src/yen_agent/
+src/resto_agent/
   reservation/         # the swap point
     base.py            #   ReservationService ABC  ← tools depend only on this
     models.py          #   provider-agnostic domain models
     errors.py          #   Libro error-code → typed exception mapping
     jsonapi.py         #   shared httpx JSON:API client
     mock.py            #   MockReservationService (in-process or http)
-    libro_private.py   #   LibroPrivateReservationService — REAL YEN (token auth)
+    libro_private.py   #   LibroPrivateReservationService — REAL venue (token auth)
   concierge.py         # reservation orchestration + spoken responses (no LiveKit)
   datetime_resolve.py  # deterministic natural-language date parsing
   phone.py             # phone-number normalization to E.164
   tools.py             # LiveKit @function_tool wrappers
   agent.py             # AgentSession wiring + entrypoint (prewarm, metrics)
-  prompts.py / faq.py  # system prompt + Yen FAQ knowledge base
+  prompts.py / faq.py  # system prompt + venue FAQ knowledge base
   store.py             # durable call log: calls, messages, tool traces, outcomes
   dashboard.py         # read-only FastAPI HTML view over that log
   notify.py            # staff alerts (SMS / email) for messages and failures
   config.py            # env-driven settings
 scripts/               # demo, setup check, call log CLI, Libro probes, client report
 tests/                 # 231 tests, run with no cloud services and no API keys
-docs/YEN_owner_questions.xlsx  # questions for the restaurant owner (hand this off)
+docs/owner_questions.xlsx  # questions for the restaurant owner (hand this off)
 ```
 
 ## Disclosure
@@ -321,7 +321,7 @@ docs/YEN_owner_questions.xlsx  # questions for the restaurant owner (hand this o
 The agent tells callers it's an AI assistant and always offers a path to a human
 or to leave a message — good practice, and required in some jurisdictions.
 
-> The hours/address/menu in `src/yen_agent/faq.py` are drawn from public listings
-> (the restaurant's site, OpenTable, Yelp, Tourisme Montréal). Third-party sources
+> The hours/address/menu in `src/resto_agent/faq.py` are drawn from public listings
+> (the restaurant's site, OpenTable, Yelp, city tourism listings). Third-party sources
 > disagree slightly on exact hours, and the **table inventory in `floorplan.py` is
 > a realistic placeholder** — confirm both with the restaurant before live use.

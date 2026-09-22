@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import datetime as dt
 
-from yen_agent import datetime_resolve as dr
+from resto_agent import datetime_resolve as dr
 
 # A fixed reference: Wednesday, 2026-07-01.
 TODAY = dt.date(2026, 7, 1)

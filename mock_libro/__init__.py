@@ -1,7 +1,7 @@
 """A local mock of the Libro reservation JSON:API.
 
 This package represents an *external* service (Libro). It deliberately lives at
-the repo root, not under ``yen_agent``, to reinforce that the agent must only
+the repo root, not under ``resto_agent``, to reinforce that the agent must only
 talk to it through the ``ReservationService`` abstraction — never by importing
 mock internals.
 

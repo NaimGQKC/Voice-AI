@@ -1,12 +1,12 @@
-# Connecting the agent to the real YEN reservations (Libro private API)
+# Connecting the agent to the real venue reservations (Libro private API)
 
-YEN's reservations run on **LibroReserve** (now part of OpenTable). The official
+the venue's reservations run on **LibroReserve** (now part of OpenTable). The official
 partner API route did not respond, so the live path is the **private dashboard
 API** — the same REST/JSON API that `dashboard.libroreserve.com` uses, based on a
 network analysis of the live session (July 2026).
 
 Because every backend sits behind the `ReservationService` interface, supporting
-this is **one adapter file** — `src/yen_agent/reservation/libro_private.py` — and
+this is **one adapter file** — `src/resto_agent/reservation/libro_private.py` — and
 a config switch. The agent, tools, and concierge are unchanged.
 
 ## The dialect (vs. the mock)
@@ -17,14 +17,14 @@ a config switch. The agent, tools, and concierge are unchanged.
 | Auth | OAuth bearer | `Authorization: Token token="…", email="…"` (static) |
 | Accept | `…libro-restricted-v2+json` | **per-endpoint**: `…libro-private-v1+json` (JSON:API) / `…libro-private-v2+json` (/availabilities); writes send `Content-Type: application/vnd.api+json` |
 | Party size | `size` | `slots` |
-| Availability | `GET /restricted/…/seatings` | `GET /availabilities/{YYYY-MM-DD}?restaurant-id=8169` |
+| Availability | `GET /restricted/…/seatings` | `GET /availabilities/{YYYY-MM-DD}?restaurant-id=<redacted>` |
 | Reservation | `booking` | `POST /bookings` (JSON:API; `time` + `slots`; person+service rels) |
 | Guest | `person` | `person` (`GET /people/query` to search; `POST /people` type `people`) |
-| Restaurant | rest id in path | `restaurant-id=8169` query param |
+| Restaurant | rest id in path | `restaurant-id=<redacted>` query param |
 
 Endpoints (confirmed from a live dashboard HAR, 24 Jul 2026):
-`GET /availabilities/{date}?restaurant-id=8169`,
-`GET /services?restaurant-id=8169&started-on={date}&only-services=true`,
+`GET /availabilities/{date}?restaurant-id=<redacted>`,
+`GET /services?restaurant-id=<redacted>&started-on={date}&only-services=true`,
 `GET /people/query?query=`, `GET/POST /people`,
 `POST /bookings`, `GET/PATCH /bookings/{id}`.
 
@@ -60,7 +60,7 @@ used a service marked `"closed"` (staff can book outside online hours).
   "relationships": {
     "service":    { "data": { "type": "services",    "id": "<slot service id>" } },
     "person":     { "data": { "type": "people",      "id": "<personId>" } },
-    "restaurant": { "data": { "type": "restaurants", "id": "8169" } } } } }
+    "restaurant": { "data": { "type": "restaurants", "id": "<redacted>" } } } } }
 ```
 
 `expected-leave-at` = slot + **90 min** (the server's turn length, confirmed by
@@ -104,7 +104,7 @@ live floor (`scripts/test_booking_libro.py --yes-write`):
 
 ```
 Found 28 open slots; using 11:30 AM (2026-09-08T11:30:00-04:00)
-CREATED   booking id=111634069 status=approved time=2026-09-08T15:30:00Z
+CREATED   booking id=<redacted> status=approved time=2026-09-08T15:30:00Z
 CANCELLED status=cancelled
 ```
 
@@ -136,14 +136,14 @@ also be done end-to-end through the agent once availability is confirmed.)
 In `.env`:
 
 ```dotenv
-YEN_RESERVATION_BACKEND=libro-private
+AGENT_RESERVATION_BACKEND=libro-private
 LIBRO_PRIVATE_TOKEN=<the token — treat like a password>
 LIBRO_PRIVATE_EMAIL=<your Libro login email>
-LIBRO_PRIVATE_RESTAURANT_ID=8169
+LIBRO_PRIVATE_RESTAURANT_ID=<redacted>
 ```
 
 Then run the agent exactly as before (`python agent.py console`). Every booking
-now lands on YEN's real Libro floor.
+now lands on the venue's real Libro floor.
 
 ## Notes
 

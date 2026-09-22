@@ -89,7 +89,7 @@ def check_env_file() -> None:
         "google": ("GOOGLE_API_KEY", "https://aistudio.google.com/apikey"),
         "livekit": (None, "(uses your LiveKit credentials)"),
     }
-    provider = os.environ.get("YEN_LLM_PROVIDER", "google").lower()
+    provider = os.environ.get("AGENT_LLM_PROVIDER", "google").lower()
     key_name, where = llm_keys.get(provider, llm_keys["google"])
     print(f"  (LLM provider: {provider})")
     if key_name:
@@ -172,7 +172,7 @@ async def check_keys_live() -> None:
 
         # OpenAI-compatible providers: validate the key AND list usable models,
         # so you never have to guess a model name that still exists.
-        provider = os.environ.get("YEN_LLM_PROVIDER", "groq").lower()
+        provider = os.environ.get("AGENT_LLM_PROVIDER", "groq").lower()
         _compatible = {
             "groq": ("GROQ_API_KEY", "https://api.groq.com/openai/v1/models",
                      "https://console.groq.com/keys"),
@@ -199,9 +199,9 @@ async def check_keys_live() -> None:
                             if ids:
                                 print(f"         {DIM}available models: "
                                       f"{', '.join(ids)}{END}")
-                                chosen = os.environ.get("YEN_LLM_MODEL", "")
+                                chosen = os.environ.get("AGENT_LLM_MODEL", "")
                                 if chosen and chosen not in ids:
-                                    warn(f"YEN_LLM_MODEL='{chosen}' is not in that list",
+                                    warn(f"AGENT_LLM_MODEL='{chosen}' is not in that list",
                                          "Set it to one of the models above.")
                         except Exception:  # noqa: BLE001
                             pass
@@ -233,7 +233,7 @@ async def check_keys_live() -> None:
         elif provider == "livekit":
             ok("LLM routed via LiveKit Inference (uses your LiveKit credentials)")
         else:
-            warn(f"unknown YEN_LLM_PROVIDER='{provider}'",
+            warn(f"unknown AGENT_LLM_PROVIDER='{provider}'",
                  "Use one of: groq, xai, cerebras, openai, livekit, google.")
 
     # LiveKit: mint a local access token (validates key/secret format+pairing).
@@ -267,8 +267,8 @@ async def check_logic() -> None:
     try:
         import datetime as dt
 
-        from yen_agent.concierge import Concierge
-        from yen_agent.reservation.mock import MockReservationService
+        from resto_agent.concierge import Concierge
+        from resto_agent.reservation.mock import MockReservationService
 
         svc = MockReservationService.in_process(db_path=":memory:")
         c = Concierge(svc, today=dt.date.today())
@@ -284,7 +284,7 @@ async def check_logic() -> None:
 
 
 def main() -> int:
-    print("YEN voice agent — preflight check")
+    print("restaurant voice agent — preflight check")
     check_env_file()
     check_installs()
     asyncio.run(check_keys_live())

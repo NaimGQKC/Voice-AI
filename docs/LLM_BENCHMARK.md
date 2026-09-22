@@ -77,8 +77,8 @@ format is new.
 ### The prompt set: 24 cases, 6 French
 
 Drawn from this agent's real job, using the **real system prompt** from
-`yen_agent.prompts` and the **real tool schemas**, which the script extracts by parsing
-the AST of `src/yen_agent/tools.py`. Parsing rather than importing means the schemas
+`resto_agent.prompts` and the **real tool schemas**, which the script extracts by parsing
+the AST of `src/resto_agent/tools.py`. Parsing rather than importing means the schemas
 cannot drift from the agent, and the benchmark runs without the heavy `[agent]` extras.
 
 Coverage: booking with an explicit time · relative date (`tomorrow evening`) · relative
@@ -241,7 +241,7 @@ figure is not a prediction for our prompt.** Part of the gap between 0.95s and 3
 plainly prompt size, before any queueing.
 
 **[VENDOR MARKETING]** The "sub-100ms first token" claim — which appears in this repo's
-own `src/yen_agent/agent.py` docstring — I could not substantiate for any 70B model at any
+own `src/resto_agent/agent.py` docstring — I could not substantiate for any 70B model at any
 prompt size. Groq's own materials say "sub-second". Treat sub-100ms as marketing that has
 leaked into our code comments.
 
@@ -368,13 +368,13 @@ rate-limit hypothesis confirmed on its own, without even needing the paid compar
 
 Per scope, I changed no existing file. These are the changes I would make:
 
-1. **`src/yen_agent/agent.py`** — the `_build_llm` docstring says Groq free is
+1. **`src/resto_agent/agent.py`** — the `_build_llm` docstring says Groq free is
    *"30 req/min, ~14,400/day"* and *"Sub-100ms first token"*. Both are wrong for our
    model: `llama-3.3-70b-versatile` free is **1,000 RPD** (14,400 is the *8B* figure), and
    the binding constraint is **12,000 TPM**, not RPM. Sub-100ms is unsubstantiated
    marketing. This comment is actively misleading the model decision.
 
-2. **`src/yen_agent/agent.py`** — set `service_tier` explicitly on the Groq client.
+2. **`src/resto_agent/agent.py`** — set `service_tier` explicitly on the Groq client.
    `auto` uses on-demand limits then falls back to Flex, which is the right behaviour for
    a phone line on a paid plan. Also consider passing `APIConnectOptions` with a shorter
    `retry_interval`: 2.0s of silence mid-call is worse than a graceful failure, and the

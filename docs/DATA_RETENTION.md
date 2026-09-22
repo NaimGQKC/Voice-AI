@@ -20,7 +20,7 @@ with the restaurant before going live.
 **Not stored:** payment details (we never collect any), audio recordings, or
 email content.
 
-**Transcripts are OPT-IN.** Set `YEN_STORE_TRANSCRIPTS=1` to record them. They
+**Transcripts are OPT-IN.** Set `AGENT_STORE_TRANSCRIPTS=1` to record them. They
 are off by default and deliberately so: a transcript can contain anything a
 caller chose to say, which is a different category of sensitivity from a name
 and a phone number. When enabled they are covered by the same 90-day purge as

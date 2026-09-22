@@ -34,8 +34,8 @@ from fastapi.responses import HTMLResponse
 
 from .store import CallStore
 
-#: Set YEN_DASHBOARD_TOKEN to require ?token=… . Unset = open (local use only).
-_TOKEN_ENV = "YEN_DASHBOARD_TOKEN"
+#: Set AGENT_DASHBOARD_TOKEN to require ?token=… . Unset = open (local use only).
+_TOKEN_ENV = "AGENT_DASHBOARD_TOKEN"
 
 
 def _authorized(token: str) -> bool:
@@ -119,7 +119,7 @@ def _stat(n, label: str, tone: str = "") -> str:
 
 
 def build_app(store: CallStore | None = None) -> FastAPI:
-    app = FastAPI(title="YEN voice agent", docs_url=None, redoc_url=None)
+    app = FastAPI(title="restaurant voice agent", docs_url=None, redoc_url=None)
     _store = store
 
     def get_store() -> CallStore:
@@ -237,8 +237,8 @@ def build_app(store: CallStore | None = None) -> FastAPI:
         )
         return f"""<!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>YEN — voice agent</title><style>{CSS}</style></head><body><div class="wrap">
-<h1>YEN — voice agent</h1>
+<title>Restaurant voice agent</title><style>{CSS}</style></head><body><div class="wrap">
+<h1>Restaurant voice agent</h1>
 <div class="sub">Last {days} days{masked_note}</div>
 <div class="grid">{cards}</div>
 <h2>What calls turned into</h2>{bars}
@@ -267,7 +267,7 @@ nothing here can change a booking.</footer>
         else:
             body = ("<p class='empty'>No transcript stored for this call. "
                     "Transcripts are off by default — set "
-                    "<code>YEN_STORE_TRANSCRIPTS=1</code> to record them "
+                    "<code>AGENT_STORE_TRANSCRIPTS=1</code> to record them "
                     "(they are far more sensitive than a name and number; see "
                     "docs/DATA_RETENTION.md).</p>")
 

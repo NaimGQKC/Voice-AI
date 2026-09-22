@@ -14,7 +14,7 @@ from livekit.agents import Agent, function_tool
 
 from .concierge import Concierge
 
-logger = logging.getLogger("yen-agent.tools")
+logger = logging.getLogger("resto-agent.tools")
 
 _FALLBACK = (
     "Sorry, I had trouble looking that up just now. Let me take a message and "
@@ -52,7 +52,7 @@ def _safe(fn):
 
 
 class ReservationAgent(Agent):
-    """The Yen reservations agent. Tools call the injected concierge."""
+    """The restaurant reservations agent. Tools call the injected concierge."""
 
     def __init__(self, concierge: Concierge, *, instructions: str):
         super().__init__(instructions=instructions)
@@ -64,7 +64,7 @@ class ReservationAgent(Agent):
         self, date: str, party_size: int, part_of_day: str = "",
         preferred_time: str = "",
     ) -> str:
-        """Check open reservation times at Yen.
+        """Check open reservation times at the venue.
 
         Always pass `preferred_time` when the caller named one — the system then
         confirms that exact time, or offers the closest alternatives, or another
@@ -185,7 +185,7 @@ class ReservationAgent(Agent):
     @function_tool
     @_safe
     async def answer_faq(self, topic: str) -> str:
-        """Answer a common question about Yen.
+        """Answer a common question about the venue.
 
         Args:
             topic: One of: hours, location, parking, menu, dietary,

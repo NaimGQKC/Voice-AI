@@ -27,7 +27,7 @@ or upgrade. WAL mode is on so a reader (the owner running ``scripts/calls.py``)
 never blocks the agent mid-call.
 
 ⚠️  **Deployment constraint this introduces.** The agent was previously stateless
-per call and could run on ephemeral disk. It can't now. ``YEN_DB_PATH`` must
+per call and could run on ephemeral disk. It can't now. ``AGENT_DB_PATH`` must
 point at a **persistent volume**, or every restart silently loses the messages —
 reintroducing exactly the bug this module removes.
 
@@ -221,7 +221,7 @@ class CallStore:
     """
 
     def __init__(self, db_path: str = ""):
-        self.db_path = db_path or os.environ.get("YEN_DB_PATH", "yen_calls.db")
+        self.db_path = db_path or os.environ.get("AGENT_DB_PATH", "resto_calls.db")
         self._lock = threading.Lock()
         if self.db_path != ":memory:":
             Path(self.db_path).expanduser().parent.mkdir(parents=True, exist_ok=True)

@@ -1,4 +1,4 @@
-"""LibroPrivateReservationService — the real Libro dashboard API (id 8169).
+"""LibroPrivateReservationService — the real Libro dashboard API (id <redacted>).
 
 Wire format confirmed from live dashboard traffic (24 Jul 2026), not guesses:
 
@@ -8,8 +8,8 @@ Wire format confirmed from live dashboard traffic (24 Jul 2026), not guesses:
   Content-Type on writes: application/vnd.api+json
   Auth:    Authorization: Token token="<TOKEN>", email="<EMAIL>"
 
-  GET  /availabilities/{YYYY-MM-DD}?restaurant-id=8169     bookable slots (nested map)
-  GET  /services?restaurant-id=8169&started-on={date}      shifts + capacity (JSON:API)
+  GET  /availabilities/{YYYY-MM-DD}?restaurant-id=<redacted>     bookable slots (nested map)
+  GET  /services?restaurant-id=<redacted>&started-on={date}      shifts + capacity (JSON:API)
   GET  /people/query?query={text}                          guest autocomplete
   GET/POST /people                                         guest CRUD (JSON:API)
   POST /bookings                                            create reservation (JSON:API)
@@ -211,7 +211,7 @@ DASHBOARD_URL = "https://dashboard.libroreserve.com/restaurants/{rid}/reservatio
 
 
 def _reaches_libro(client: httpx.AsyncClient) -> bool:
-    """True only if a write on this client would actually land on YEN's floor.
+    """True only if a write on this client would actually land on the venue's floor.
 
     Two things have to hold. The host must be Libro's — this adapter is also
     pointed at the local mock. And the transport must be a real one: the test
@@ -235,7 +235,7 @@ def _announce_live_booking(booking, restaurant_id: str) -> None:
         url = DASHBOARD_URL.format(rid=restaurant_id)
         banner = (
             "\n" + "!" * 78 +
-            "\n!!  A REAL BOOKING NOW EXISTS ON YEN'S FLOOR — DELETE IT WHEN DONE" +
+            "\n!!  A REAL BOOKING NOW EXISTS ON THE VENUE'S FLOOR — DELETE IT WHEN DONE" +
             f"\n!!  booking id : {booking.id}" +
             f"\n!!  time       : {booking.time}" +
             f"\n!!  party      : {booking.size}" +

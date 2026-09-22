@@ -4,7 +4,7 @@ Work down this list out loud in `console` mode. Each case is drawn from what
 **actually happened** in the venue's 84 real calls, not from imagination.
 
 ```powershell
-python -m yen_agent.agent console      # mock restaurant — nothing is real
+python -m resto_agent.agent console      # mock restaurant — nothing is real
 ```
 
 **Report back only the ones that fail.** Paste what you said and what it said.
@@ -59,8 +59,8 @@ dead-end you.
 | Say | Should happen |
 |---|---|
 | *"Une table pour huit"* | **Cannot book it.** Offers a person — Libro can't hold 7+ |
-| *"C'est combien pour un plateau de sushi?"* | **Refuses to quote prices**, points at the online menu |
-| *"Je veux commander des sushis à emporter"* | Offers the website **or** a callback — not a table |
+| *"C'est combien pour un plateau du chef?"* | **Refuses to quote prices**, points at the online menu |
+| *"Je veux commander des plats à emporter"* | Offers the website **or** a callback — not a table |
 | *"Vous avez des options végétaliennes?"* | *"Not always fully"* — not a flat yes |
 | *"Vous êtes ouverts dimanche midi?"* | **Closed Sunday lunch.** Dinner only |
 | Ask something not in the FAQ | Takes a message. **Must not invent an answer** |
@@ -87,7 +87,7 @@ Prices and invented facts are the two that would actually embarrass the owner.
 Once A–E look right:
 
 ```
-YEN_RESERVATION_BACKEND=libro-private
+AGENT_RESERVATION_BACKEND=libro-private
 ```
 
 Book **one** table, **far out** (2031), by voice. Then:

@@ -21,18 +21,19 @@ from pathlib import Path
 import httpx
 import pytest
 
-from yen_agent.concierge import Concierge
-from yen_agent.reservation import libro_private as lp
-from yen_agent.reservation.errors import (
+from resto_agent import faq
+from resto_agent.concierge import Concierge
+from resto_agent.reservation import libro_private as lp
+from resto_agent.reservation.errors import (
     BackendAuthError,
     BackendUnavailableError,
     BookingOutcomeUnknownError,
     ReservationError,
     SlotUnavailableError,
 )
-from yen_agent.reservation.libro_private import LibroPrivateReservationService
-from yen_agent.reservation.mock import MockReservationService
-from yen_agent.store import CallStore
+from resto_agent.reservation.libro_private import LibroPrivateReservationService
+from resto_agent.reservation.mock import MockReservationService
+from resto_agent.store import CallStore
 from tests.conftest import future_date, slot_time
 
 #: A date inside the booking horizon, for the Concierge tests (which validate it).
@@ -161,7 +162,7 @@ async def test_outage_plus_unwritable_store_gives_the_restaurant_number(store):
         await c.service.aclose()
 
     assert not _claims_success(msg)
-    assert "514-543-3354" in msg          # a human they can reach themselves
+    assert faq.PHONE in msg               # a human they can reach themselves
     assert "call you right back" not in msg.lower()  # no promise we can't keep
 
 
@@ -293,7 +294,7 @@ async def test_a_real_no_is_still_spoken_as_a_no(store):
 def _service(handler=None) -> LibroPrivateReservationService:
     svc = LibroPrivateReservationService(token="fake-token",
                                          email="owner@example.com",
-                                         restaurant_id="8169")
+                                         restaurant_id="<redacted>")
     if handler is not None:
         old = svc._client
         svc._client = httpx.AsyncClient(
@@ -332,7 +333,7 @@ def test_timeouts_are_sized_for_a_live_phone_call():
 def test_explicit_timeout_override_still_applies_everywhere():
     svc = _service()
     other = LibroPrivateReservationService(token="t", email="e@x.co",
-                                           restaurant_id="8169", timeout=1.0)
+                                           restaurant_id="<redacted>", timeout=1.0)
     assert other._read_timeout.read == 1.0 and other._write_timeout.read == 1.0
     assert svc._read_timeout.read != 1.0
 
@@ -574,7 +575,7 @@ async def test_patch_refuses_to_blank_a_booking_it_could_not_read(monkeypatch):
     svc = _service(handler)
     try:
         with pytest.raises(BackendUnavailableError):
-            await svc.cancel_booking("111634069")
+            await svc.cancel_booking("<redacted>")
     finally:
         await svc.aclose()
 
@@ -722,7 +723,7 @@ def _canned(*, availability=None, services=None, status=200, services_status=200
 def libro_env(monkeypatch):
     monkeypatch.setenv("LIBRO_PRIVATE_TOKEN", "not-a-real-token")
     monkeypatch.setenv("LIBRO_PRIVATE_EMAIL", "owner@example.com")
-    monkeypatch.setenv("LIBRO_PRIVATE_RESTAURANT_ID", "8169")
+    monkeypatch.setenv("LIBRO_PRIVATE_RESTAURANT_ID", "<redacted>")
 
 
 async def test_healthcheck_passes_on_the_known_good_api(libro_env, monkeypatch):

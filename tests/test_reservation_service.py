@@ -8,13 +8,13 @@ from __future__ import annotations
 
 import pytest
 
-from yen_agent.reservation.errors import (
+from resto_agent.reservation.errors import (
     LargePartyError,
     NotCancelableError,
     PartySizeOutOfRangeError,
     SlotUnavailableError,
 )
-from yen_agent.reservation.models import Availability, Booking
+from resto_agent.reservation.models import Availability, Booking
 from tests.conftest import future_date, slot_time
 
 

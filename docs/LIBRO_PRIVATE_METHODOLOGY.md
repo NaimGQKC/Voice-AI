@@ -1,12 +1,12 @@
 # Methodology: safely integrating with Libro's private API
 
-How we connected the voice agent to YEN's real reservation system (LibroReserve,
+How we connected the voice agent to the venue's real reservation system (LibroReserve,
 now OpenTable) without official partner access, and did it safely enough to run
 against a production floor.
 
 ## The situation
 
-- YEN takes reservations through Libro. The **official partner API** route did
+- The venue takes reservations through Libro. The **official partner API** route did
   not respond, so there was no supported integration path.
 - Libro's dashboard (`dashboard.libroreserve.com`) is an Ember.js single-page app
   talking to a private JSON:API at `api.libroreserve.com`, authenticated with a
@@ -51,9 +51,9 @@ against a production floor.
 
 | Capability | Call |
 |---|---|
-| Availability for a day | `GET /availabilities/{YYYY-MM-DD}?restaurant-id=8169` |
-| Services (shift capacity) | `GET /services?restaurant-id=8169&started-on={date}` |
-| Day notes | `GET /notes?restaurant-id=8169&started-on={date}` |
+| Availability for a day | `GET /availabilities/{YYYY-MM-DD}?restaurant-id=<redacted>` |
+| Services (shift capacity) | `GET /services?restaurant-id=<redacted>&started-on={date}` |
+| Day notes | `GET /notes?restaurant-id=<redacted>&started-on={date}` |
 | Guest search | `GET /people/query?query={text}` |
 | Guest create | `POST /people` (JSON:API, type `people`) |
 | Create reservation | `POST /bookings` (JSON:API, type `bookings`) |

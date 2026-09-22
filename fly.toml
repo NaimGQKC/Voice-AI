@@ -1,4 +1,4 @@
-# Fly.io deployment for the YEN voice agent worker.
+# Fly.io deployment for the restaurant voice agent worker.
 #
 # Region is yyz (Toronto) — the only Canadian region among the hosts we
 # evaluated. Render and Railway have none. It is the shortest hop to a Montreal
@@ -9,15 +9,15 @@
 #   fly secrets set KEY=value   # see docs/DEPLOY.md for the full list
 #   fly deploy
 
-app = "yen-voice-agent"
+app = "resto-voice-agent"
 primary_region = "yyz"
 
 [build]
 
 [env]
-  YEN_RESERVATION_BACKEND = "libro-private"
-  YEN_LANGUAGE_MODE = "multi"
-  YEN_LLM_PROVIDER = "google"
+  AGENT_RESERVATION_BACKEND = "libro-private"
+  AGENT_LANGUAGE_MODE = "multi"
+  AGENT_LLM_PROVIDER = "google"
 
 [http_service]
   # livekit-agents serves a health endpoint on 8081. Exposing it is what lets

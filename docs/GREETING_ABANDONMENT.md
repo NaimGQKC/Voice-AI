@@ -77,7 +77,7 @@ change is unfalsifiable.**
 
 **Step 2 — the three cheap fixes**, all low-risk:
 - Hard-cap the greeting with `session.say()` verbatim (already done) and shorten
-  it further; front-load "YEN, how can I help?" and move the AI disclosure to a
+  it further; front-load "<name>, how can I help?" and move the AI disclosure to a
   second clause the caller can talk over
 - Confirm barge-in is enabled *during the greeting*, not just during replies
 - Greet bilingually for a venue that is two-thirds French

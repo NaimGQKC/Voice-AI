@@ -511,7 +511,7 @@ class Concierge:
             return (
                 "I'm sorry — I'm having trouble saving that on my end, and I'd "
                 "rather not promise a callback I can't guarantee. Could you try us "
-                "again shortly, or call 514-543-3354?"
+                f"again shortly, or call {faq.PHONE}?"
             )
 
         self.waitlist.append(entry)
@@ -764,7 +764,7 @@ class Concierge:
             return (
                 "I'm sorry — I'm having trouble saving that on my end, and I don't "
                 "want to promise something I can't deliver. Could you call us back "
-                "in a few minutes, or reach us at 514-543-3354?"
+                f"in a few minutes, or reach us at {faq.PHONE}?"
             )
 
         self.messages.append(Message(name=name, phone=normalized, body=message))

@@ -24,7 +24,7 @@ cp .env.example .env
 1. Go to **<https://console.deepgram.com/signup>**
 2. Sign up (Google/GitHub is fastest). **No card required.**
 3. You land on the dashboard. Left sidebar → **API Keys**.
-4. **Create a New API Key** → name it `yen-agent` → permissions **Member** →
+4. **Create a New API Key** → name it `resto-agent` → permissions **Member** →
    **Create Key**.
 5. **Copy it now** — Deepgram shows the key exactly once.
 6. Paste into `.env`:
@@ -50,7 +50,7 @@ minutes a month, so that is years of testing.
 
 ```bash
 python scripts/check_setup.py     # should be all green for Tier 1
-python -m yen_agent.agent console
+python -m resto_agent.agent console
 ```
 
 Speak to it. **Use headphones** — without them the agent hears itself through
@@ -58,7 +58,7 @@ your speakers and interrupts itself, which looks like a bug and isn't.
 
 Try: *"Do you have a table for two tomorrow at seven?"*
 
-This runs against a **fake restaurant**. Nothing you do here touches YEN.
+This runs against a **fake restaurant**. Nothing you do here touches the real venue.
 
 > **Expect rough edges on the first run.** Nobody has spoken to this system yet;
 > 231 tests cover the logic, not the voice. Finding two or three problems here is
@@ -66,7 +66,7 @@ This runs against a **fake restaurant**. Nothing you do here touches YEN.
 
 ---
 
-# TIER 2 — book real tables at YEN
+# TIER 2 — book real tables at the venue
 
 **No new accounts.** You already have the Libro token.
 
@@ -81,7 +81,7 @@ This runs against a **fake restaurant**. Nothing you do here touches YEN.
    ```
 3. Flip the backend:
    ```
-   YEN_RESERVATION_BACKEND=libro-private
+   AGENT_RESERVATION_BACKEND=libro-private
    ```
 
 **Before you let it book anything by voice**, do one controlled write:
@@ -112,7 +112,7 @@ test enforces that. Libro stays the system of record.
 
 **Phone numbers are masked** (`•••• 2020`). Add `?full=1` to reveal them.
 
-> ⚠️ To expose it beyond your laptop you **must** set `YEN_DASHBOARD_TOKEN`.
+> ⚠️ To expose it beyond your laptop you **must** set `AGENT_DASHBOARD_TOKEN`.
 > The script refuses to bind to a public address without one, because the page
 > shows guest names.
 
@@ -133,8 +133,8 @@ Roughly half a day, most of it waiting on account verification rather than work.
 |---|---|
 | Agent talks over itself / responds to nothing | No headphones — it's hearing its own voice |
 | `Plugins must be registered on the main thread` | Stale install: `pip install -e ".[agent]"` |
-| `429` / quota errors mid-conversation | Free LLM tier exhausted. Add billing, or switch `YEN_LLM_PROVIDER` |
-| It says a time isn't available when it is | Check `YEN_RESERVATION_BACKEND` — `mock` has its own fake calendar |
+| `429` / quota errors mid-conversation | Free LLM tier exhausted. Add billing, or switch `AGENT_LLM_PROVIDER` |
+| It says a time isn't available when it is | Check `AGENT_RESERVATION_BACKEND` — `mock` has its own fake calendar |
 | Long silence before it answers | The LLM's first-token time. Try another provider — it's one line in `.env` |
 
 `python scripts/check_setup.py` diagnoses most of these.

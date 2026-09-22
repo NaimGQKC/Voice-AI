@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from yen_agent.phone import normalize_phone, spoken_phone
+from resto_agent.phone import normalize_phone, spoken_phone
 
 
 def test_various_formats_normalize_to_e164():

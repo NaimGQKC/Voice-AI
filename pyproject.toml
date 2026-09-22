@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "yen-voice-agent"
+name = "resto-voice-agent"
 version = "0.1.0"
-description = "Bilingual (FR/EN) voice AI phone agent for Yen Restaurant (Montreal), built on LiveKit Agents with a swappable Libro reservation backend."
+description = "Bilingual (FR/EN) voice AI phone agent for a restaurant (Montreal), built on LiveKit Agents with a swappable Libro reservation backend."
 readme = "README.md"
 requires-python = ">=3.10,<3.15"
 license = { text = "Apache-2.0" }
@@ -36,13 +36,13 @@ dev = [
 ]
 
 [project.scripts]
-yen-mock-libro = "mock_libro.__main__:main"
+resto-mock-libro = "mock_libro.__main__:main"
 
-# `yen_agent` lives under src/; `mock_libro` lives at the repo root (it
+# `resto_agent` lives under src/; `mock_libro` lives at the repo root (it
 # represents an *external* service). Both are importable after `pip install -e .`.
 [tool.setuptools.packages.find]
 where = ["src", "."]
-include = ["yen_agent*", "mock_libro*"]
+include = ["resto_agent*", "mock_libro*"]
 exclude = ["tests*"]
 
 [tool.pytest.ini_options]

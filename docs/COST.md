@@ -163,7 +163,7 @@ non-issue.
 decision no longer blocks: if it sounds wrong, the fallback is another
 zero-account voice, not a second cloud provider.
 
-This also reinforces the greeting design already shipped: **"YEN, bonjour !"** —
+This also reinforces the greeting design already shipped: **"<name>, bonjour !"** —
 French first, two words, ~0.9s.
 
 ## The part the owner actually cares about: management burden

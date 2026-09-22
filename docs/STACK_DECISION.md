@@ -423,7 +423,7 @@ owner hearing it.**
 
 Because: (a) it costs nothing to manage, which is the dominant criterion;
 (b) the accent penalty is real but mild and about warmth, not comprehension;
-(c) `config.py` already accepts a `provider/model` override in `YEN_TTS_MODEL`,
+(c) `config.py` already accepts a `provider/model` override in `AGENT_TTS_MODEL`,
 so being wrong costs one line; (d) the owner is the only qualified judge — he
 knows his callers.
 

@@ -1,6 +1,6 @@
 # What 84 real calls to this venue actually look like
 
-Source: the incumbent system's own call log for YEN, **30 Jun – 25 Jul 2026**,
+Source: the incumbent system's own call log for the venue, **30 Jun – 25 Jul 2026**,
 84 calls, exported read-only and redacted (guest names pseudonymised, phone
 numbers masked). This is measured behaviour at *this* venue, not industry
 averages — which makes it the most valuable input we have.

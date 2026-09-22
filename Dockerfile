@@ -27,11 +27,11 @@ COPY scripts/ ./scripts/
 # Download the turn-detector / VAD model weights at BUILD time. Without this the
 # first call after every deploy pays the download — which is the cold start we
 # moved off LiveKit Cloud to avoid.
-RUN python -m yen_agent.agent download-files || \
+RUN python -m resto_agent.agent download-files || \
     echo "WARNING: model prefetch failed; first call will be slow"
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
 # `start` runs the worker against LiveKit and waits for dispatched calls.
-CMD ["python", "-m", "yen_agent.agent", "start"]
+CMD ["python", "-m", "resto_agent.agent", "start"]

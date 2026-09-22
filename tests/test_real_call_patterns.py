@@ -1,6 +1,6 @@
 """Regression tests derived from 84 REAL calls to this venue (Jun 30 - Jul 25 2026).
 
-Source: the incumbent system's own call log for YEN, exported read-only. Each test
+Source: the incumbent system's own call log for the venue, exported read-only. Each test
 below encodes a failure or success that actually happened to a real caller, so the
 numbers in the docstrings are measured, not estimated.
 
@@ -13,9 +13,9 @@ from __future__ import annotations
 
 import pytest
 
-from yen_agent.concierge import Concierge
-from yen_agent.reservation.mock import MockReservationService
-from yen_agent.store import CallStore
+from resto_agent.concierge import Concierge
+from resto_agent.reservation.mock import MockReservationService
+from resto_agent.store import CallStore
 from tests.conftest import future_date
 
 
@@ -42,7 +42,7 @@ async def test_takeout_caller_is_captured_not_dead_ended(store):
     c = await _concierge(store)
     try:
         msg = c.handle_takeout(name="Chris", phone="514-555-2020",
-                               order="12 pieces of sushi for pickup tonight")
+                               order="12 portions of the daily special for pickup tonight")
         assert "call you right back" in msg.lower()
         assert "website" not in msg.lower()  # not a brush-off
     finally:
@@ -50,7 +50,7 @@ async def test_takeout_caller_is_captured_not_dead_ended(store):
 
     rows = store.pending_messages()
     assert [r.kind for r in rows] == ["takeout"]
-    assert "12 pieces" in rows[0].body
+    assert "12 portions" in rows[0].body
 
 
 async def test_takeout_caller_happy_with_website_is_not_forced_into_a_callback(store):
@@ -67,7 +67,7 @@ async def test_takeout_caller_happy_with_website_is_not_forced_into_a_callback(s
 async def test_takeout_without_a_number_asks_for_one_before_promising(store):
     c = await _concierge(store)
     try:
-        msg = c.handle_takeout(order="sushi platter")
+        msg = c.handle_takeout(order="tasting platter")
         assert "number" in msg.lower()
     finally:
         await c.service.aclose()
@@ -103,7 +103,7 @@ async def test_cancellation_completes_without_a_human(store):
 # ---------------------------------------------------------------------------
 
 async def test_no_availability_anywhere_captures_instead_of_transferring(store):
-    from yen_agent.reservation.models import Availability
+    from resto_agent.reservation.models import Availability
 
     c = await _concierge(store)
     try:
@@ -129,8 +129,8 @@ def test_party_ceiling_is_six_because_libro_cannot_express_seven():
     only ever returned party-size keys 1-6, and forcing &size=7 returns 200 with
     no "7" key. Setting this to 7 would make the agent tell a party of seven
     "we're fully booked" instead of offering to have staff arrange it."""
-    from yen_agent import faq
-    from yen_agent.reservation import libro_private
+    from resto_agent import faq
+    from resto_agent.reservation import libro_private
 
     assert libro_private.MAX_ONLINE_PARTY == 6
     assert faq.MAX_ONLINE_PARTY == 6
@@ -142,7 +142,7 @@ def test_party_ceiling_is_six_because_libro_cannot_express_seven():
 
 def test_am_pm_inference_matches_the_venue_rule():
     """'No context and hour 1-8 -> always PM', including 24h-style '07h15'."""
-    from yen_agent import datetime_resolve as dr
+    from resto_agent import datetime_resolve as dr
 
     assert dr.resolve_time("7") == (19, 0)
     assert dr.resolve_time("7h15") == (19, 15)
@@ -156,7 +156,7 @@ def test_am_pm_inference_matches_the_venue_rule():
 # ---------------------------------------------------------------------------
 
 def test_hours_match_the_venue_configuration():
-    from yen_agent import faq
+    from resto_agent import faq
 
     hours = faq.answer("hours", locale="en")
     assert "11:30" in hours and "2:30" in hours

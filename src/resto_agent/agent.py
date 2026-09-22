@@ -1,11 +1,11 @@
-"""LiveKit Agents entrypoint and voice-stack wiring for the Yen agent.
+"""LiveKit Agents entrypoint and voice-stack wiring for the restaurant agent.
 
 Run modes (after `pip install -e ".[agent]"` and filling in `.env`):
 
-    python -m yen_agent.agent console   # local terminal audio, no server
-    python -m yen_agent.agent dev       # connect to LiveKit Cloud + browser test
+    python -m resto_agent.agent console   # local terminal audio, no server
+    python -m resto_agent.agent dev       # connect to LiveKit Cloud + browser test
 
-The reservation backend is chosen by env (`YEN_RESERVATION_BACKEND`), defaulting
+The reservation backend is chosen by env (`AGENT_RESERVATION_BACKEND`), defaulting
 to the in-process mock — so this runs end-to-end with no Libro credentials.
 
 Structure follows LiveKit's recommended patterns: bundled VAD, metrics + usage
@@ -67,7 +67,7 @@ try:
 except Exception:  # pragma: no cover
     _MTL = dt.timezone(dt.timedelta(hours=-4))
 
-logger = logging.getLogger("yen-agent")
+logger = logging.getLogger("resto-agent")
 
 
 def _montreal_today() -> dt.date:
@@ -91,7 +91,7 @@ def _build_stt(settings: Settings):
 #:
 #: Bump the suffix whenever the system prompt or tool schemas change, so a stale
 #: prefix is never served.
-PROMPT_CACHE_KEY = "yen-agent-v1"
+PROMPT_CACHE_KEY = "resto-agent-v1"
 
 
 @dataclass(frozen=True)
@@ -201,7 +201,7 @@ def _build_llm(settings: Settings):
     spec = OPENAI_COMPATIBLE.get(provider)
     if spec is None:
         raise ValueError(
-            f"Unknown YEN_LLM_PROVIDER={provider!r}. Known: "
+            f"Unknown AGENT_LLM_PROVIDER={provider!r}. Known: "
             + ", ".join(sorted([*OPENAI_COMPATIBLE, "anthropic", "google", "livekit"]))
         )
 
@@ -246,7 +246,7 @@ def _build_tts(settings: Settings):
     ⚠️ But **every Deepgram Aura / Aura-2 voice is English-only** (every model
     id ends in ``-en``; see ``livekit.plugins.deepgram.models.TTSModels``). Our
     greeting is now French first, for a venue whose calls are two-thirds French
-    — and an English voice reading "YEN, bonjour !" produces exactly the
+    — and an English voice reading "<name>, bonjour !" produces exactly the
     mangled, obviously-foreign pronunciation that makes a Québécois caller hang
     up. That defeats the change it is meant to serve.
 
@@ -255,7 +255,7 @@ def _build_tts(settings: Settings):
     ``console`` mode) we fall back to Deepgram and say so loudly, because the
     French will sound wrong and that must not be discovered on a live call.
 
-    ``YEN_TTS_MODEL`` overrides both: a value with a "/" goes through LiveKit
+    ``AGENT_TTS_MODEL`` overrides both: a value with a "/" goes through LiveKit
     Inference, anything else is treated as a Deepgram model name.
     """
     override = (settings.tts_model or "").strip()
@@ -266,8 +266,8 @@ def _build_tts(settings: Settings):
             return inference.TTS(model=override)
         return deepgram.TTS(model=override)
 
-    # The greeting is "Bonjour, Hi. YEN Cuisine Japonaise" in EVERY mode, so the
-    # voice must speak French regardless of YEN_LANGUAGE_MODE. Gating this on
+    # The greeting is "Bonjour, Hi. the restaurant" in EVERY mode, so the
+    # voice must speak French regardless of AGENT_LANGUAGE_MODE. Gating this on
     # is_multilingual was a bug: with the flag unset the agent read a French
     # greeting through an English-only Deepgram voice, which is precisely the
     # mangled pronunciation this whole choice exists to avoid.
@@ -279,9 +279,9 @@ def _build_tts(settings: Settings):
 
     logger.warning(
         "No LiveKit credentials: falling back to the English-only Deepgram voice "
-        "%s. The greeting is 'Bonjour, Hi. YEN Cuisine Japonaise' in every mode, "
+        "%s. The greeting is 'Bonjour, Hi. the restaurant' in every mode, "
         "so the French WILL be mispronounced — this was caught on the first live "
-        "test. Set LIVEKIT_API_KEY/LIVEKIT_URL, or YEN_TTS_MODEL, before putting "
+        "test. Set LIVEKIT_API_KEY/LIVEKIT_URL, or AGENT_TTS_MODEL, before putting "
         "this on a real line.",
         DEEPGRAM_VOICE,
     )
@@ -477,7 +477,7 @@ async def entrypoint(ctx: JobContext) -> None:
     # over SIP telephony, where echo control is the carrier's job rather than a
     # local AEC that needs to converge, and (b) `resume_false_interruption` is
     # on by default, so a mis-fire resumes the greeting instead of killing it.
-    # If truncated greetings ever show up, YEN_AEC_WARMUP_S raises it back
+    # If truncated greetings ever show up, AGENT_AEC_WARMUP_S raises it back
     # without a code change.
     session = AgentSession(
         stt=_build_stt(settings),
@@ -504,10 +504,10 @@ async def entrypoint(ctx: JobContext) -> None:
 
         ⚠️ A transcript is materially more sensitive than a name and a number —
         it can contain anything a caller said. It is therefore OPT-IN via
-        YEN_STORE_TRANSCRIPTS, and covered by the same retention purge as
+        AGENT_STORE_TRANSCRIPTS, and covered by the same retention purge as
         everything else (docs/DATA_RETENTION.md).
         """
-        if os.environ.get("YEN_STORE_TRANSCRIPTS", "").lower() not in ("1", "true", "yes"):
+        if os.environ.get("AGENT_STORE_TRANSCRIPTS", "").lower() not in ("1", "true", "yes"):
             return ""
         try:
             lines = []
@@ -564,7 +564,7 @@ async def _speak_greeting(session, agent, settings: Settings,
     Two `say()` calls rather than one sentence, and this is the whole point of
     the disclosure design in ``prompts.py``:
 
-    * The caller hears "YEN, bonjour !" (~1s) and can answer immediately.
+    * The caller hears "<name>, bonjour !" (~1s) and can answer immediately.
     * The disclosure follows as its own speech handle. If they have already
       started talking, we simply never start it — we do not talk over a caller
       to read them a compliance line.

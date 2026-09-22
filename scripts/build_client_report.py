@@ -1,4 +1,4 @@
-"""Client-facing progress + cost report for YEN Cuisine Japonaise."""
+"""Client-facing progress + cost report for the restaurant."""
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT
@@ -10,7 +10,7 @@ from reportlab.platypus import (
     TableStyle,
 )
 
-OUT = "/home/user/FuckEcosystemLockIn/YEN_voice_agent_report.pdf"
+OUT = "/home/user/FuckEcosystemLockIn/restaurant_voice_agent_report.pdf"
 
 INK = colors.HexColor("#1a1a19")
 DIM = colors.HexColor("#6b6b68")
@@ -80,7 +80,7 @@ story = []
 A = story.append
 
 # ---------------------------------------------------------------- cover ----
-A(P("YEN Cuisine Japonaise", "title"))
+A(P("the restaurant", "title"))
 A(P("AI phone assistant &mdash; progress report and cost breakdown<br/>"
     "Prepared 29 July 2026", "sub"))
 A(rule())
@@ -244,7 +244,7 @@ A(table([
 
 A(P("2. A new phone number, not your existing one", "h"))
 A(P("The assistant answers a brand-new 514 number. Your existing line, "
-    "514-543-3354, is untouched and rings in the restaurant exactly as it does "
+    "514-555-0100, is untouched and rings in the restaurant exactly as it does "
     "today. Nothing changes for your current callers until you decide to point "
     "them at it.", "p"))
 
@@ -286,7 +286,7 @@ SimpleDocTemplate(
     OUT, pagesize=LETTER,
     leftMargin=0.85 * inch, rightMargin=0.85 * inch,
     topMargin=0.7 * inch, bottomMargin=0.6 * inch,
-    title="YEN Cuisine Japonaise — AI phone assistant",
+    title="the restaurant — AI phone assistant",
     author="",
 ).build(story)
 print("wrote", OUT)

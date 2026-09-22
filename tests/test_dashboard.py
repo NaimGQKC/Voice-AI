@@ -12,8 +12,8 @@ pytest.importorskip("fastapi")
 
 from fastapi.testclient import TestClient  # noqa: E402
 
-from yen_agent.dashboard import build_app  # noqa: E402
-from yen_agent.store import CallStore  # noqa: E402
+from resto_agent.dashboard import build_app  # noqa: E402
+from resto_agent.store import CallStore  # noqa: E402
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def client():
     store.start_call("call-2", locale="fr")
     store.end_call("call-2", outcome="no_user_turn")
     store.record_message(call_id="call-1", kind="takeout", name="Chris",
-                         phone="+15145552020", body="12 pieces de sushi")
+                         phone="+15145552020", body="12 portions du plat du jour")
     store.record_booking_attempt(call_id="call-1", ok=False, party_size=7,
                                  wanted_time="2026-08-01T19:00", name="Alex",
                                  phone="+15145551234", error="LargePartyError")
@@ -35,7 +35,7 @@ def client():
 def test_renders_the_things_that_need_a_human(client):
     body = client.get("/").text
     assert "Chris" in body               # the outstanding message
-    assert "12 pieces de sushi" in body  # what they actually wanted
+    assert "12 portions du plat du jour" in body  # what they actually wanted
     assert "LargePartyError" in body     # the booking that failed
 
 
@@ -52,7 +52,7 @@ def test_full_numbers_require_an_explicit_act(client):
 
 
 def test_token_is_enforced_when_configured(client, monkeypatch):
-    monkeypatch.setenv("YEN_DASHBOARD_TOKEN", "s3cret")
+    monkeypatch.setenv("AGENT_DASHBOARD_TOKEN", "s3cret")
     assert client.get("/").status_code == 401
     assert client.get("/?token=wrong").status_code == 401
     assert client.get("/?token=s3cret").status_code == 200
@@ -65,7 +65,7 @@ def test_no_token_configured_means_open(client):
 
 def test_health_is_unauthenticated_and_cheap(client, monkeypatch):
     """The host's liveness probe cannot carry a secret."""
-    monkeypatch.setenv("YEN_DASHBOARD_TOKEN", "s3cret")
+    monkeypatch.setenv("AGENT_DASHBOARD_TOKEN", "s3cret")
     r = client.get("/health")
     assert r.status_code == 200
     assert "ok" in r.text.lower()
@@ -153,7 +153,7 @@ def test_transcript_page_shows_the_conversation(rich):
 def test_transcript_page_says_so_when_none_was_stored(rich):
     body = TestClient(build_app(rich)).get("/call/c2").text
     assert "No transcript stored" in body
-    assert "YEN_STORE_TRANSCRIPTS" in body
+    assert "AGENT_STORE_TRANSCRIPTS" in body
 
 
 def test_transcript_is_html_escaped():
@@ -173,7 +173,7 @@ def test_unknown_call_is_404(rich):
 
 
 def test_call_detail_requires_the_token(rich, monkeypatch):
-    monkeypatch.setenv("YEN_DASHBOARD_TOKEN", "s3cret")
+    monkeypatch.setenv("AGENT_DASHBOARD_TOKEN", "s3cret")
     c = TestClient(build_app(rich))
     assert c.get("/call/c1").status_code == 401
     assert c.get("/call/c1?token=s3cret").status_code == 200

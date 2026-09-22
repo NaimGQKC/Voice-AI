@@ -9,7 +9,7 @@ stripped out, so the console output is safe to share.
 
 ## How to capture the HAR (5 steps, ~2 minutes)
 
-1. In Chrome/Edge, open  https://dashboard.libroreserve.com/restaurants/8169/reservations
+1. In Chrome/Edge, open  https://dashboard.libroreserve.com/restaurants/<redacted>/reservations
    and log in.
 2. Press F12 → open the **Network** tab. Tick **Preserve log**. Filter: **Fetch/XHR**.
 3. Do the things we want to learn:

@@ -12,9 +12,9 @@ from __future__ import annotations
 
 import pytest
 
-from yen_agent import prompts
-from yen_agent.config import Settings
-from yen_agent.prompts import (
+from resto_agent import faq, prompts
+from resto_agent.config import Settings
+from resto_agent.prompts import (
     DISCLOSURE_EN,
     DISCLOSURE_FR,
     GREETING_EN,
@@ -85,13 +85,15 @@ def test_greeting_is_french_only():
 
 def test_greeting_names_the_restaurant_first():
     """The caller must know who answered before anything else."""
-    # The caller must learn who they reached almost immediately. The owner's
-    # greeting leads with "Bonjour, Hi" — a Montreal convention that signals the
-    # language before naming the venue — so we assert the NAME ARRIVES EARLY
-    # rather than literally first.
+    # The caller must learn who they reached almost immediately. The greeting
+    # opens with "Bonjour" — a Montreal convention that signals the language
+    # before naming the venue — so we assert the NAME ARRIVES EARLY rather than
+    # literally first. The name itself comes from configuration, so assert
+    # against that rather than any one venue's name.
+    name = faq.VENUE_NAME.upper()
     for greeting in (GREETING_FR, GREETING_EN):
-        assert "YEN" in greeting.upper()
-        assert greeting.upper().index("YEN") <= 16, greeting
+        assert name in greeting.upper()
+        assert greeting.upper().index(name) <= 16, greeting
 
 
 def test_greeting_carries_no_disclosure_text():
@@ -150,9 +152,9 @@ def test_aec_warmup_defaults_to_disabled():
 
 
 def test_aec_warmup_is_env_overridable_and_typo_safe(monkeypatch):
-    monkeypatch.setenv("YEN_AEC_WARMUP_S", "0.4")
+    monkeypatch.setenv("AGENT_AEC_WARMUP_S", "0.4")
     assert Settings.from_env().aec_warmup_s == pytest.approx(0.4)
-    monkeypatch.setenv("YEN_AEC_WARMUP_S", "not-a-number")
+    monkeypatch.setenv("AGENT_AEC_WARMUP_S", "not-a-number")
     assert Settings.from_env().aec_warmup_s == 0.0  # must never break the phone
 
 
@@ -197,7 +199,7 @@ async def test_session_accepts_the_aec_override_without_deprecation(monkeypatch)
 
     from livekit.agents import AgentSession
 
-    from yen_agent.agent import _build_llm, _build_stt, _build_tts, _build_turn_handling
+    from resto_agent.agent import _build_llm, _build_stt, _build_tts, _build_turn_handling
 
     for key, val in (
         ("DEEPGRAM_API_KEY", "fake"), ("GROQ_API_KEY", "fake"),
@@ -254,7 +256,7 @@ class _FakeAgent:
 
 @pytest.fixture
 def greeting_mod():
-    return pytest.importorskip("yen_agent.agent")
+    return pytest.importorskip("resto_agent.agent")
 
 
 async def test_uninterrupted_call_hears_greeting_then_disclosure(greeting_mod):
@@ -334,7 +336,7 @@ def test_deepgram_voices_are_english_only():
 
 
 def test_multilingual_tts_is_not_the_english_only_voice(monkeypatch):
-    agent_mod = pytest.importorskip("yen_agent.agent")
+    agent_mod = pytest.importorskip("resto_agent.agent")
     monkeypatch.setenv("LIVEKIT_API_KEY", "fake")
     monkeypatch.setenv("LIVEKIT_API_SECRET", "fake")
     monkeypatch.setenv("LIVEKIT_URL", "wss://fake.livekit.cloud")
@@ -346,7 +348,7 @@ def test_multilingual_tts_is_not_the_english_only_voice(monkeypatch):
 
 
 def test_english_mode_keeps_the_single_vendor_deepgram_voice(monkeypatch):
-    agent_mod = pytest.importorskip("yen_agent.agent")
+    agent_mod = pytest.importorskip("resto_agent.agent")
     monkeypatch.setenv("DEEPGRAM_API_KEY", "fake")
     monkeypatch.setenv("GOOGLE_API_KEY", "fake")
     tts = agent_mod._build_tts(Settings())
@@ -354,7 +356,7 @@ def test_english_mode_keeps_the_single_vendor_deepgram_voice(monkeypatch):
 
 
 def test_tts_model_env_override_wins(monkeypatch):
-    agent_mod = pytest.importorskip("yen_agent.agent")
+    agent_mod = pytest.importorskip("resto_agent.agent")
     monkeypatch.setenv("DEEPGRAM_API_KEY", "fake")
     monkeypatch.setenv("GOOGLE_API_KEY", "fake")
     tts = agent_mod._build_tts(Settings(language_mode="multi", tts_model="aura-2-thalia-en"))
@@ -363,13 +365,13 @@ def test_tts_model_env_override_wins(monkeypatch):
 
 def test_without_livekit_credentials_warns_loudly(monkeypatch, caplog):
     """Falling back to an English voice for a French greeting must not be quiet."""
-    agent_mod = pytest.importorskip("yen_agent.agent")
+    agent_mod = pytest.importorskip("resto_agent.agent")
     monkeypatch.delenv("LIVEKIT_API_KEY", raising=False)
     monkeypatch.delenv("LIVEKIT_URL", raising=False)
     monkeypatch.setenv("DEEPGRAM_API_KEY", "fake")
     monkeypatch.setenv("GOOGLE_API_KEY", "fake")
 
-    with caplog.at_level("WARNING", logger="yen-agent"):
+    with caplog.at_level("WARNING", logger="resto-agent"):
         agent_mod._build_tts(Settings(language_mode="multi"))
     assert any("mispronounced" in r.getMessage() for r in caplog.records)
 

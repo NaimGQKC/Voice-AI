@@ -6,7 +6,7 @@ import datetime as dt
 
 import pytest
 
-from yen_agent.reservation.mock import MockReservationService
+from resto_agent.reservation.mock import MockReservationService
 
 # Montreal offset used by the mock's seeded seatings.
 TZ = "-04:00"

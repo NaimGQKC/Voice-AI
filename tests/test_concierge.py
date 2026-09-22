@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from yen_agent.concierge import Concierge
-from yen_agent.reservation.mock import MockReservationService
+from resto_agent.concierge import Concierge
+from resto_agent.reservation.mock import MockReservationService
 from tests.conftest import future_date, slot_time
 
 
@@ -56,8 +56,8 @@ async def test_cancel_unknown_phone_is_graceful():
 
 async def test_natural_language_date_is_resolved():
     import datetime as dt
-    from yen_agent.concierge import Concierge
-    from yen_agent.reservation.mock import MockReservationService
+    from resto_agent.concierge import Concierge
+    from resto_agent.reservation.mock import MockReservationService
 
     # Use the real today so the mock's past-slot filter agrees with the resolver;
     # "tomorrow" + dinner is always a valid future seating (dinner runs daily).
@@ -74,8 +74,8 @@ async def test_natural_language_date_is_resolved():
 
 async def test_past_date_is_refused_gracefully():
     import datetime as dt
-    from yen_agent.concierge import Concierge
-    from yen_agent.reservation.mock import MockReservationService
+    from resto_agent.concierge import Concierge
+    from resto_agent.reservation.mock import MockReservationService
 
     svc = MockReservationService.in_process(db_path=":memory:")
     c = Concierge(svc, today=dt.date(2026, 7, 1))
@@ -278,7 +278,7 @@ async def test_cascade_offers_another_day_when_the_day_is_full(monkeypatch):
 
         async def patched(date, party_size):
             if date == full_day:
-                from yen_agent.reservation.models import Availability
+                from resto_agent.reservation.models import Availability
                 return Availability(date=date, party_size=party_size, slots=[])
             return await real(date, party_size)
 
@@ -295,7 +295,7 @@ async def test_cascade_ends_in_waitlist_capture_not_a_transfer(monkeypatch):
     """When nothing is available anywhere, capture the caller — never dead-end."""
     c = await make_concierge()
     try:
-        from yen_agent.reservation.models import Availability
+        from resto_agent.reservation.models import Availability
 
         async def nothing(date, party_size):
             return Availability(date=date, party_size=party_size, slots=[])

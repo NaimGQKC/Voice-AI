@@ -13,7 +13,7 @@ from contextlib import redirect_stdout
 
 import pytest
 
-from yen_agent.store import CALLS_TELEMETRY_COLUMNS, TELEMETRY_FIELDS, CallStore
+from resto_agent.store import CALLS_TELEMETRY_COLUMNS, TELEMETRY_FIELDS, CallStore
 
 
 @pytest.fixture
@@ -36,7 +36,7 @@ class _Clock:
 
 @pytest.fixture
 def tele():
-    agent_mod = pytest.importorskip("yen_agent.agent")
+    agent_mod = pytest.importorskip("resto_agent.agent")
     clock = _Clock()
     return agent_mod.GreetingTelemetry(now=clock), clock
 
@@ -119,7 +119,7 @@ def test_a_normal_call_measures_all_five_numbers(tele):
     t.mark_answered()
     clock.advance(0.42)          # dead air before the agent speaks
     t.mark_agent_speaking()
-    clock.advance(1.1)           # "YEN, bonjour !"
+    clock.advance(1.1)           # "<name>, bonjour !"
     t.mark_greeting_done(interrupted=False, disclosure_spoken=True)
     clock.advance(0.8)
     t.mark_user_spoke(language="fr")

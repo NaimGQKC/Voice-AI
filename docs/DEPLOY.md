@@ -57,7 +57,7 @@ fly secrets set \
   DEEPGRAM_API_KEY=... \
   GOOGLE_API_KEY=... \
   LIBRO_PRIVATE_TOKEN=... LIBRO_PRIVATE_EMAIL=... \
-  YEN_DB_URL=...
+  AGENT_DB_URL=...
 fly deploy
 fly logs                        # watch the worker register with LiveKit
 ```
@@ -79,7 +79,7 @@ Two things in `fly.toml` are load-bearing and must not be "tidied up":
 3. Point its **Origination URI** at the LiveKit SIP host from step 1.
 4. Assign the number to the trunk.
 
-The owner asked for a **brand-new number for the AI**, keeping **514-543-3354**
+The owner asked for a **brand-new number for the AI**, keeping **514-555-0100**
 as the in-store line. So the AI never touches the existing number — the lowest
 risk way to start, and it makes the live-transfer target unambiguous.
 

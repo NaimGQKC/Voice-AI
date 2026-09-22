@@ -18,7 +18,7 @@ def test_restaurants_jsonapi_shape():
     assert r.headers["content-type"].startswith(CONTENT_TYPE)
     data = r.json()["data"]
     assert data[0]["type"] == "restaurant"
-    assert data[0]["attributes"]["name"] == "YEN Cuisine Japonaise"
+    assert data[0]["attributes"]["name"] == "Demo Bistro"
 
 
 def test_seatings_returns_date_keyed_slots():

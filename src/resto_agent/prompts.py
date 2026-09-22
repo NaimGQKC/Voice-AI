@@ -1,4 +1,4 @@
-"""System prompt(s) for the Yen voice agent."""
+"""System prompt(s) for the restaurant voice agent."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from . import faq
 #    an English word inside a French utterance made the whole line sound off.
 #    Judged by ear on a real call, which beats the argument we had on paper.
 #    Nothing is lost: an anglophone hears "Bonjour" and answers in English, and
-#    the STT (`YEN_LANGUAGE_MODE=multi`, Deepgram nova-3 `language=multi`)
+#    the STT (`AGENT_LANGUAGE_MODE=multi`, Deepgram nova-3 `language=multi`)
 #    switches us on their first words.
 #
 # 2. UNDER ~1.5 SECONDS TO THE USEFUL PART. The previous greeting was 14 words;
@@ -28,8 +28,9 @@ from . import faq
 #
 # 3. THE AI DISCLOSURE IS A SEPARATE, INTERRUPTIBLE SECOND CLAUSE — see below.
 #
-# Verbatim from the owner: "Bonjour, Hi. YEN Cuisine Japonaise".
-GREETING_FR = "Bonjour. YEN Cuisine Japonaise."
+# The venue name is injected from configuration (``AGENT_RESTAURANT_NAME``),
+# never hard-coded, so no client name is committed to this repo.
+GREETING_FR = f"Bonjour. {faq.VENUE_NAME}."
 GREETING_EN = GREETING_FR
 
 # ---------------------------------------------------------------------
@@ -49,7 +50,7 @@ GREETING_EN = GREETING_FR
 #       can talk straight over — and if they DO talk over it, require the model
 #       to disclose in its first substantive reply instead.
 #
-# We chose (c). What it buys: the caller hears "YEN, bonjour !" at ~0.9s and
+# We chose (c). What it buys: the caller hears "<name>, bonjour !" at ~0.9s and
 # can respond at once; a caller who waits hears the disclosure at ~1.2s, which
 # is earlier than the old greeting reached it anyway.
 #
@@ -96,7 +97,7 @@ def greeting_for(multilingual: bool) -> tuple[str, str]:
     """
     # Both are FRENCH-LEADING in every mode, because the greeting is. Returning
     # the English disclosure after a French greeting produced exactly what a
-    # first live test caught: "Bonjour, Hi. YEN Cuisine Japonaise." followed by
+    # first live test caught: "Bonjour, Hi. the restaurant." followed by
     # "AI assistant — how can I help?" — two languages, two registers, in the
     # first three seconds. The caller has not spoken yet, so there is nothing to
     # match against; we lead French and switch off their first words.
@@ -153,7 +154,7 @@ def system_instructions(*, multilingual: bool, today: str = "") -> str:
         f"\n\n# Today\nToday's date is {today} (America/Toronto timezone). Use it "
         "for any relative dates.\n" if today else ""
     )
-    return f"""You are the phone reservations assistant for YEN Cuisine Japonaise, an intimate Japanese restaurant in downtown Montreal.
+    return f"""You are the phone reservations assistant for {faq.VENUE_NAME}, an intimate restaurant in downtown Montreal.
 
 # How to speak (this is a PHONE CALL — brevity matters more than completeness)
 - **Keep every reply to one or two short sentences.** Long replies are painful to
@@ -192,7 +193,7 @@ def system_instructions(*, multilingual: bool, today: str = "") -> str:
   take their order in their own words plus a number and call `handle_takeout`.
 
 # How seating works (the reservation system handles the table math — you explain it)
-- The room is small and is **tables only — there is no sushi bar or counter**, so
+- The room is small and is **tables only — there is no bar or counter seating**, so
   never offer counter seating. The
   system automatically picks the right table, and for a larger party it combines
   ("merges") tables when it can. If `check_availability` or `book_reservation` says a

@@ -58,7 +58,7 @@ Usage
 Cron (daily at 08:15, mail on failure only — `--quiet` prints nothing when OK,
 and cron mails you whatever a job prints):
 
-    15 8 * * * cd /srv/yen && /srv/yen/.venv/bin/python scripts/healthcheck.py --quiet
+    15 8 * * * cd /srv/resto && /srv/resto/.venv/bin/python scripts/healthcheck.py --quiet
 
 Exit codes (all non-zero mean "look at this"):
     0  healthy
@@ -346,7 +346,7 @@ async def run_health_check(*, offsets=DEFAULT_PROBE_OFFSETS,
     report = Report()
     token = os.environ.get("LIBRO_PRIVATE_TOKEN", "").strip()
     email = os.environ.get("LIBRO_PRIVATE_EMAIL", "").strip()
-    restaurant_id = os.environ.get("LIBRO_PRIVATE_RESTAURANT_ID", "8169").strip()
+    restaurant_id = os.environ.get("LIBRO_PRIVATE_RESTAURANT_ID", "<redacted>").strip()
     base_url = os.environ.get("LIBRO_PRIVATE_BASE_URL",
                               "https://api.libroreserve.com").strip()
     today = today or dt.date.today()
@@ -477,7 +477,7 @@ async def run_health_check(*, offsets=DEFAULT_PROBE_OFFSETS,
 
 
 def _print_human(report: Report) -> None:
-    print("YEN — Libro integration health check")
+    print("Libro integration health check")
     print(f"  {dt.datetime.now().astimezone().isoformat(timespec='seconds')}\n")
     for c in report.checks:
         mark = f"{GREEN}[ok]{END}  " if c["ok"] else f"{RED}[FAIL]{END}"
@@ -494,7 +494,7 @@ def _print_human(report: Report) -> None:
         print(f"\n  {RED}API DRIFT — the adapter's assumptions no longer hold:{END}")
         for d in report.drift:
             print(f"    - {d}")
-        print(f"\n  {DIM}Fix in src/yen_agent/reservation/libro_private.py; "
+        print(f"\n  {DIM}Fix in src/resto_agent/reservation/libro_private.py; "
               f"see docs/LIBRO_PRIVATE_INTEGRATION.md.{END}")
     print()
     code = report.exit_code
@@ -570,7 +570,7 @@ def main(argv=None) -> int:
     elif args.quiet:
         if code != EXIT_OK:
             # Cron mails whatever the job prints, so print the actionable part.
-            print(f"YEN Libro health check FAILED ({_summary(report)})")
+            print(f"Libro health check FAILED ({_summary(report)})")
             for item in report.unreachable + report.drift:
                 print(f"  - {item}")
             for c in report.checks:

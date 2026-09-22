@@ -3,7 +3,7 @@
 Belt-and-braces check so you never have to open the dashboard:
 
     python scripts/verify_booking.py            # checks the test booking
-    python scripts/verify_booking.py 111634069  # or any booking id
+    python scripts/verify_booking.py <redacted>  # or any booking id
 
 It reads the booking (read-only). If it is already cancelled it says so and
 stops. If it is somehow still active, it cancels it and re-reads to confirm.
@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT))
 
 #: The controlled test booking created by scripts/test_booking_libro.py.
-DEFAULT_BOOKING_ID = "111634069"
+DEFAULT_BOOKING_ID = "<redacted>"
 
 BOLD, GREEN, RED, YELLOW, END = "\033[1m", "\033[92m", "\033[91m", "\033[93m", "\033[0m"
 
@@ -56,13 +56,13 @@ async def main() -> int:
 
     token = os.environ.get("LIBRO_PRIVATE_TOKEN", "")
     email = os.environ.get("LIBRO_PRIVATE_EMAIL", "")
-    rid = os.environ.get("LIBRO_PRIVATE_RESTAURANT_ID", "8169")
+    rid = os.environ.get("LIBRO_PRIVATE_RESTAURANT_ID", "<redacted>")
     if not token or not email:
         print("Set LIBRO_PRIVATE_TOKEN and LIBRO_PRIVATE_EMAIL in .env first.")
         return 1
 
-    from yen_agent.reservation.errors import BookingNotFoundError
-    from yen_agent.reservation.libro_private import LibroPrivateReservationService
+    from resto_agent.reservation.errors import BookingNotFoundError
+    from resto_agent.reservation.libro_private import LibroPrivateReservationService
 
     svc = LibroPrivateReservationService(token=token, email=email, restaurant_id=rid)
     try:
@@ -77,7 +77,7 @@ async def main() -> int:
         _banner(booking)
         if booking.is_cancelled:
             print(f"\n{GREEN}{BOLD}✅ CONFIRMED CANCELLED — nothing is booked on "
-                  f"YEN's floor.{END}")
+                  f"the venue's floor.{END}")
             print(f"{GREEN}   No action needed. You can ignore the dashboard.{END}\n")
             return 0
 

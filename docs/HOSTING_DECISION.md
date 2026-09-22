@@ -261,7 +261,7 @@ with the phone line as the stake.
 
 ## 4.3 The finding that actually bites option B: voice isolation
 
-`src/yen_agent/agent.py:433` sets `noise_cancellation.BVC()`. LiveKit's feature
+`src/resto_agent/agent.py:433` sets `noise_cancellation.BVC()`. LiveKit's feature
 matrix meters Krisp **BVC** under **voice isolation**, explicitly ✅ — *"Applies
 to Krisp BVC, Krisp BVCTelephony, and ai-coustics Voice Focus 2.1"*:
 
@@ -402,8 +402,8 @@ The owner's real criterion. Setup is excluded; only what recurs is listed.
 ## 5.1 What is genuinely zero
 
 - **No code changes.** `agent.py` already selects providers from env vars:
-  `YEN_LLM_PROVIDER` (`groq`/`cerebras`/`xai`/`openai`/`livekit`/`google`),
-  `YEN_TTS_MODEL` (a value containing `/` routes via LiveKit Inference, otherwise
+  `AGENT_LLM_PROVIDER` (`groq`/`cerebras`/`xai`/`openai`/`livekit`/`google`),
+  `AGENT_TTS_MODEL` (a value containing `/` routes via LiveKit Inference, otherwise
   Deepgram), and the Deepgram plugin path is already the default for STT/English
   TTS. Both the Inference path and the BYO-plugin path are already written and
   exercised. **Switching from A to B, or back, is an environment-variable

@@ -10,19 +10,19 @@ from __future__ import annotations
 
 import pytest
 
-from yen_agent.reservation.base import ReservationService
-from yen_agent.reservation.libro_private import LibroPrivateReservationService
+from resto_agent.reservation.base import ReservationService
+from resto_agent.reservation.libro_private import LibroPrivateReservationService
 
 
 def _svc() -> LibroPrivateReservationService:
     return LibroPrivateReservationService(
-        token="fake-token", email="owner@example.com", restaurant_id="8169"
+        token="fake-token", email="owner@example.com", restaurant_id="<redacted>"
     )
 
 
 def test_requires_token_and_email():
     with pytest.raises(ValueError):
-        LibroPrivateReservationService(token="", email="", restaurant_id="8169")
+        LibroPrivateReservationService(token="", email="", restaurant_id="<redacted>")
 
 
 def test_is_a_concrete_reservation_service():
@@ -100,7 +100,7 @@ async def test_availability_parses_nested_map(monkeypatch):
 
 async def test_service_lookup_is_non_fatal(monkeypatch):
     """If /services fails, booking still proceeds (server infers the shift)."""
-    from yen_agent.reservation.errors import BookingNotFoundError
+    from resto_agent.reservation.errors import BookingNotFoundError
 
     svc = _svc()
 
@@ -141,7 +141,7 @@ async def test_service_id_requires_exact_slot_match(monkeypatch):
 
 
 async def test_create_booking_without_matching_service_raises(monkeypatch):
-    from yen_agent.reservation.errors import SlotUnavailableError
+    from resto_agent.reservation.errors import SlotUnavailableError
 
     svc = _svc()
 
@@ -195,12 +195,12 @@ async def test_create_booking_sends_expected_leave_at(monkeypatch):
     rels = data["relationships"]
     assert rels["service"]["data"]["id"] == "S1"
     assert rels["person"]["data"]["id"] == "P1"
-    assert rels["restaurant"]["data"] == {"type": "restaurants", "id": "8169"}
+    assert rels["restaurant"]["data"] == {"type": "restaurants", "id": "<redacted>"}
     await svc.aclose()
 
 
 async def test_availability_large_party_escalates():
-    from yen_agent.reservation.errors import LargePartyError
+    from resto_agent.reservation.errors import LargePartyError
 
     svc = _svc()
     with pytest.raises(LargePartyError):
@@ -209,21 +209,21 @@ async def test_availability_large_party_escalates():
 
 
 def test_build_service_selects_private_backend(monkeypatch):
-    from yen_agent.config import Settings
-    from yen_agent.reservation import build_service
+    from resto_agent.config import Settings
+    from resto_agent.reservation import build_service
 
     s = Settings(
         reservation_backend="libro-private",
         libro_private_token="fake", libro_private_email="owner@example.com",
-        libro_private_restaurant_id="8169",
+        libro_private_restaurant_id="<redacted>",
     )
     svc = build_service(s)
     assert isinstance(svc, LibroPrivateReservationService)
 
 
 def test_build_service_private_without_token_errors():
-    from yen_agent.config import Settings
-    from yen_agent.reservation import build_service
+    from resto_agent.config import Settings
+    from resto_agent.reservation import build_service
 
     s = Settings(reservation_backend="libro-private", libro_private_token="",
                  libro_private_email="")
@@ -235,7 +235,7 @@ def test_build_service_private_without_token_errors():
 # The live-booking alarm
 # ---------------------------------------------------------------------------
 # LIVE_BOOKINGS_TO_DELETE.txt is the only thing standing between a test booking
-# and a table YEN's staff cannot sell. It used to fire on every `pytest` run,
+# and a table the venue's staff cannot sell. It used to fire on every `pytest` run,
 # which is worse than not having it: three mock rows in that file taught us to
 # scroll past exactly the warning we built it to notice.
 
@@ -243,7 +243,7 @@ def test_build_service_private_without_token_errors():
 def test_alarm_is_quiet_for_the_mock_and_for_fake_transports():
     """Only a real dispatch at Libro's host counts as touching the floor."""
     import httpx
-    from yen_agent.reservation.libro_private import _reaches_libro
+    from resto_agent.reservation.libro_private import _reaches_libro
 
     async def _handler(request):  # pragma: no cover - never dispatched
         return httpx.Response(200, json={})

@@ -43,7 +43,7 @@ def build_service(settings=None):
     """Construct the configured reservation backend.
 
     This is the single place where the mock/real swap happens. ``settings`` is a
-    :class:`yen_agent.config.Settings`; if omitted it is loaded from the
+    :class:`resto_agent.config.Settings`; if omitted it is loaded from the
     environment.
     """
 

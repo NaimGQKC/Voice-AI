@@ -1,4 +1,4 @@
-"""Run the mock Libro server: `python -m mock_libro` or `yen-mock-libro`."""
+"""Run the mock Libro server: `python -m mock_libro` or `resto-mock-libro`."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ def main() -> None:
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument(
         "--db",
-        default=os.environ.get("YEN_MOCK_DB_PATH", "mock_libro_data/yen.sqlite"),
+        default=os.environ.get("AGENT_MOCK_DB_PATH", "mock_libro_data/resto.sqlite"),
         help="SQLite path (use ':memory:' for an ephemeral store).",
     )
     args = parser.parse_args()

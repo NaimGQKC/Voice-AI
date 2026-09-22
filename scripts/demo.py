@@ -15,8 +15,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from yen_agent.concierge import Concierge  # noqa: E402
-from yen_agent.reservation.mock import MockReservationService  # noqa: E402
+from resto_agent.concierge import Concierge  # noqa: E402
+from resto_agent.reservation.mock import MockReservationService  # noqa: E402
 
 TZ = "-04:00"
 
@@ -66,7 +66,7 @@ async def main() -> None:
                    c.check_availability(date=date, party_size=2,
                                         part_of_day="dinner", preferred_time="7"))
 
-    from yen_agent.reservation.models import Availability as _A
+    from resto_agent.reservation.models import Availability as _A
 
     async def _full(d, size):
         return _A(date=d, party_size=size, slots=[])
@@ -92,8 +92,8 @@ async def main() -> None:
     # --- input understanding (the things that break live) -----------------
     import datetime as _dt
 
-    from yen_agent import datetime_resolve as dr
-    from yen_agent.phone import normalize_phone
+    from resto_agent import datetime_resolve as dr
+    from resto_agent.phone import normalize_phone
 
     print("\n=== Input understanding (deterministic) ===")
     ref = _dt.date(2026, 7, 1)  # a Wednesday

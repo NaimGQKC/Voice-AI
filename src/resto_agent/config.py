@@ -1,4 +1,4 @@
-"""Environment-driven configuration for the Yen voice agent."""
+"""Environment-driven configuration for the restaurant voice agent."""
 
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ def _env_float(key: str, default: float) -> float:
 class Settings:
     # Reservation backend
     reservation_backend: str = "mock"  # mock | mock-http | libro
-    restaurant_id: str = "rest_yen_mtl"
+    restaurant_id: str = "rest_demo_mtl"
     mock_base_url: str = "http://localhost:8000"
     mock_db_path: str = ":memory:"
 
@@ -36,14 +36,14 @@ class Settings:
     libro_private_base_url: str = "https://api.libroreserve.com"
     libro_private_token: str = ""
     libro_private_email: str = ""
-    libro_private_restaurant_id: str = "8169"  # YEN Cuisine Japonaise
+    libro_private_restaurant_id: str = "<redacted>"  # the restaurant
 
     # Voice stack
     #: Default: gemini-2.5-flash. Of every candidate assessed against primary
     #: sources, Google's Flash family is the ONLY one with both a measured TTFT
     #: inside the 200-700ms budget and a prompt cache whose 2,048-token minimum
     #: our ~3,690-token prefix actually clears. See docs/MODEL_SHORTLIST.md.
-    #: Swap with YEN_LLM_PROVIDER; every alternative is a .env change.
+    #: Swap with AGENT_LLM_PROVIDER; every alternative is a .env change.
     llm_provider: str = "google"
     llm_model: str = ""  # optional override, e.g. "gpt-4o-mini"
     #: Default `multi`: ~2/3 of this venue's callers speak French, and the
@@ -65,32 +65,32 @@ class Settings:
     #: transcribed. Our greeting is ~1s, so the SDK default would make the whole
     #: greeting (and ~2s after it) uninterruptible. See
     #: docs/GREETING_ABANDONMENT.md cause #2. Default 0.0 = barge-in from the
-    #: first frame. Raise it via YEN_AEC_WARMUP_S if echo ever self-interrupts
+    #: first frame. Raise it via AGENT_AEC_WARMUP_S if echo ever self-interrupts
     #: the greeting.
     aec_warmup_s: float = 0.0
 
     #: Durable call/message log. MUST point at a persistent volume in production
     #: — on ephemeral container disk every restart silently drops messages the
     #: agent promised to pass on.
-    db_path: str = "yen_calls.db"
+    db_path: str = "resto_calls.db"
 
     @classmethod
     def from_env(cls) -> "Settings":
         return cls(
-            reservation_backend=_env("YEN_RESERVATION_BACKEND", "mock"),
-            restaurant_id=_env("YEN_RESTAURANT_ID", "rest_yen_mtl"),
-            mock_base_url=_env("YEN_MOCK_BASE_URL", "http://localhost:8000"),
-            mock_db_path=_env("YEN_MOCK_DB_PATH", ":memory:"),
+            reservation_backend=_env("AGENT_RESERVATION_BACKEND", "mock"),
+            restaurant_id=_env("AGENT_RESTAURANT_ID", "rest_demo_mtl"),
+            mock_base_url=_env("AGENT_MOCK_BASE_URL", "http://localhost:8000"),
+            mock_db_path=_env("AGENT_MOCK_DB_PATH", ":memory:"),
             libro_private_base_url=_env("LIBRO_PRIVATE_BASE_URL", "https://api.libroreserve.com"),
             libro_private_token=_env("LIBRO_PRIVATE_TOKEN"),
             libro_private_email=_env("LIBRO_PRIVATE_EMAIL"),
-            libro_private_restaurant_id=_env("LIBRO_PRIVATE_RESTAURANT_ID", "8169"),
-            llm_provider=_env("YEN_LLM_PROVIDER", "google"),
-            llm_model=_env("YEN_LLM_MODEL", ""),
-            language_mode=_env("YEN_LANGUAGE_MODE", "multi"),
-            tts_model=_env("YEN_TTS_MODEL", ""),
-            aec_warmup_s=_env_float("YEN_AEC_WARMUP_S", 0.0),
-            db_path=_env("YEN_DB_PATH", "yen_calls.db"),
+            libro_private_restaurant_id=_env("LIBRO_PRIVATE_RESTAURANT_ID", "<redacted>"),
+            llm_provider=_env("AGENT_LLM_PROVIDER", "google"),
+            llm_model=_env("AGENT_LLM_MODEL", ""),
+            language_mode=_env("AGENT_LANGUAGE_MODE", "multi"),
+            tts_model=_env("AGENT_TTS_MODEL", ""),
+            aec_warmup_s=_env_float("AGENT_AEC_WARMUP_S", 0.0),
+            db_path=_env("AGENT_DB_PATH", "resto_calls.db"),
         )
 
     @property

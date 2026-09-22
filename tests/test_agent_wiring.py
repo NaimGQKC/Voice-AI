@@ -34,7 +34,7 @@ def _build_session(settings, with_livekit_creds: bool, monkeypatch):
 
     from livekit.agents import AgentSession
 
-    from yen_agent.agent import _build_llm, _build_stt, _build_tts, _build_turn_handling
+    from resto_agent.agent import _build_llm, _build_stt, _build_tts, _build_turn_handling
 
     return AgentSession(
         stt=_build_stt(settings),
@@ -45,7 +45,7 @@ def _build_session(settings, with_livekit_creds: bool, monkeypatch):
 
 
 def test_english_session_constructs_without_deprecations(monkeypatch):
-    from yen_agent.config import Settings
+    from resto_agent.config import Settings
 
     with warnings.catch_warnings():
         warnings.simplefilter("error", DeprecationWarning)
@@ -53,8 +53,8 @@ def test_english_session_constructs_without_deprecations(monkeypatch):
 
 
 def test_console_mode_without_livekit_creds_falls_back_to_vad(monkeypatch):
-    from yen_agent.agent import _build_turn_handling
-    from yen_agent.config import Settings
+    from resto_agent.agent import _build_turn_handling
+    from resto_agent.config import Settings
 
     monkeypatch.delenv("LIVEKIT_API_KEY", raising=False)
     monkeypatch.delenv("LIVEKIT_URL", raising=False)
@@ -63,7 +63,7 @@ def test_console_mode_without_livekit_creds_falls_back_to_vad(monkeypatch):
 
 
 def test_multilingual_session_constructs(monkeypatch):
-    from yen_agent.config import Settings
+    from resto_agent.config import Settings
 
     _build_session(
         Settings(language_mode="multi"),
@@ -73,10 +73,10 @@ def test_multilingual_session_constructs(monkeypatch):
 
 
 def test_agent_registers_all_tools():
-    from yen_agent.concierge import Concierge
-    from yen_agent.prompts import system_instructions
-    from yen_agent.reservation.mock import MockReservationService
-    from yen_agent.tools import ReservationAgent
+    from resto_agent.concierge import Concierge
+    from resto_agent.prompts import system_instructions
+    from resto_agent.reservation.mock import MockReservationService
+    from resto_agent.tools import ReservationAgent
 
     svc = MockReservationService.in_process(db_path=":memory:")
     agent = ReservationAgent(
@@ -88,10 +88,10 @@ def test_agent_registers_all_tools():
 
 async def test_tool_exception_does_not_crash_the_call():
     """A failing tool must speak a graceful line, never raise into the session."""
-    from yen_agent.concierge import Concierge
-    from yen_agent.prompts import system_instructions
-    from yen_agent.reservation.mock import MockReservationService
-    from yen_agent.tools import ReservationAgent
+    from resto_agent.concierge import Concierge
+    from resto_agent.prompts import system_instructions
+    from resto_agent.reservation.mock import MockReservationService
+    from resto_agent.tools import ReservationAgent
 
     svc = MockReservationService.in_process(db_path=":memory:")
     agent = ReservationAgent(
@@ -112,10 +112,10 @@ def test_tool_schema_survives_the_safety_wrapper():
     """@_safe must not hide the tool signature/docstring from the LLM."""
     import inspect
 
-    from yen_agent.concierge import Concierge
-    from yen_agent.prompts import system_instructions
-    from yen_agent.reservation.mock import MockReservationService
-    from yen_agent.tools import ReservationAgent
+    from resto_agent.concierge import Concierge
+    from resto_agent.prompts import system_instructions
+    from resto_agent.reservation.mock import MockReservationService
+    from resto_agent.tools import ReservationAgent
 
     svc = MockReservationService.in_process(db_path=":memory:")
     agent = ReservationAgent(
@@ -141,8 +141,8 @@ def test_builders_work_off_main_thread(monkeypatch):
     """
     import concurrent.futures as cf
 
-    from yen_agent import agent as A
-    from yen_agent.config import Settings
+    from resto_agent import agent as A
+    from resto_agent.config import Settings
 
     def build():
         s = Settings()

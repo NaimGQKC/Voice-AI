@@ -1,4 +1,4 @@
-"""Owner-facing setup guide: the accounts YEN opens so YEN owns the billing.
+"""Owner-facing setup guide: the accounts the venue opens so the venue owns the billing.
 
     python scripts/build_owner_setup_guide.py
 
@@ -21,7 +21,7 @@ from reportlab.platypus import (
     Table, TableStyle,
 )
 
-OUT = "/home/user/FuckEcosystemLockIn/YEN_owner_setup_guide.pdf"
+OUT = "/home/user/FuckEcosystemLockIn/owner_setup_guide.pdf"
 
 INK = colors.HexColor("#1a1a19")
 DIM = colors.HexColor("#6b6b68")
@@ -165,7 +165,7 @@ story = []
 A = story.append
 
 # ================================================================== cover ===
-A(P("YEN Cuisine Japonaise", "title"))
+A(P("the restaurant", "title"))
 A(P("AI phone assistant &mdash; the accounts to open<br/>"
     "A step-by-step guide. Prepared 12 August 2026.", "sub"))
 A(rule())
@@ -185,7 +185,7 @@ A(Spacer(1, 6))
 A(callout("BEFORE YOU START",
           "Set aside about <b>one hour</b>. Have ready: the restaurant&rsquo;s "
           "<b>credit card</b>, the legal business name and address "
-          "(<b>9503-0425 Quebec Inc., 2157 Rue Mackay</b>), and an email "
+          "(<b>1234-5678 Quebec Inc., 123 Example Street</b>), and an email "
           "address you want the bills to go to. Use the <b>same email for all "
           "six</b> &mdash; it makes them far easier to keep track of.",
           tone="info"))
@@ -241,9 +241,9 @@ A(account(
     [
         "Go to <b>cloud.livekit.io</b> and choose <b>Sign up</b>.",
         "Sign up with the restaurant email.",
-        "When it asks for a project name, type <b>yen-voice</b> and create it.",
+        "When it asks for a project name, type <b>resto-voice</b> and create it.",
         "In the left sidebar, click <b>Settings</b>, then <b>API Keys</b>.",
-        "Click <b>Create key</b>. Name it <b>yen-agent</b>.",
+        "Click <b>Create key</b>. Name it <b>resto-agent</b>.",
         "It shows you three values: a <b>URL</b> (starts with <font face='Courier'>wss://</font>), "
         "an <b>API Key</b>, and an <b>API Secret</b>. <b>Send me all three.</b>",
     ],
@@ -281,7 +281,7 @@ A(account(
         "the bottom you will see <b>Account SID</b> and <b>Auth Token</b> "
         "(click <b>Show</b> to reveal the token). <b>Send me both.</b>",
     ],
-    "<b>Your existing number, 514-543-3354, is not touched.</b> It keeps ringing "
+    "<b>Your existing number, 514-555-0100, is not touched.</b> It keeps ringing "
     "in the restaurant exactly as it does today. The assistant answers a "
     "brand-new number, so you can test it for as long as you like before "
     "telling a single customer about it."))
@@ -309,7 +309,7 @@ A(account(
         "Go to <b>console.deepgram.com/signup</b>.",
         "Sign up with the restaurant email.",
         "In the left sidebar click <b>API Keys</b>.",
-        "Click <b>Create a New API Key</b>, name it <b>yen-agent</b>, leave the "
+        "Click <b>Create a New API Key</b>, name it <b>resto-agent</b>, leave the "
         "permission as <b>Member</b>, and create it.",
         "Copy the key and <b>send it to me</b>. It is shown once only.",
     ],
@@ -322,7 +322,7 @@ A(account(
     "Free", "No card needed",
     [
         "Go to <b>supabase.com/dashboard</b> and sign up with the restaurant email.",
-        "Click <b>New project</b> and name it <b>yen-calls</b>.",
+        "Click <b>New project</b> and name it <b>resto-calls</b>.",
         "<b>For Region, choose &ldquo;Canada (Central)&rdquo; &mdash; ca-central-1.</b> "
         "Do not accept the default. See the note.",
         "Set a database password. Save it somewhere &mdash; a password manager, "
@@ -407,7 +407,7 @@ SimpleDocTemplate(
     OUT, pagesize=LETTER,
     leftMargin=0.8 * inch, rightMargin=0.8 * inch,
     topMargin=0.68 * inch, bottomMargin=0.5 * inch,
-    title="YEN Cuisine Japonaise — accounts to open",
+    title="the restaurant — accounts to open",
     author="Alejandro Monge",
 ).build(story)
 

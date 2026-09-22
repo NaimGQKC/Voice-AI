@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from yen_agent.store import CallStore  # noqa: E402
+from resto_agent.store import CallStore  # noqa: E402
 
 
 def _mask(phone: str) -> str:
@@ -84,7 +84,7 @@ def print_greeting_report(store, days: int) -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Inspect the voice agent's call log")
-    ap.add_argument("--db", default="", help="path to the call log (default $YEN_DB_PATH)")
+    ap.add_argument("--db", default="", help="path to the call log (default $AGENT_DB_PATH)")
     ap.add_argument("--days", type=int, default=7)
     ap.add_argument("--messages", action="store_true",
                     help="messages/waitlist the restaurant has NOT been told about")

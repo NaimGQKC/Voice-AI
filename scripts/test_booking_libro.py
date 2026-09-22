@@ -84,12 +84,12 @@ async def main() -> int:
 
     token = os.environ.get("LIBRO_PRIVATE_TOKEN", "")
     email = os.environ.get("LIBRO_PRIVATE_EMAIL", "")
-    rid = os.environ.get("LIBRO_PRIVATE_RESTAURANT_ID", "8169")
+    rid = os.environ.get("LIBRO_PRIVATE_RESTAURANT_ID", "<redacted>")
     if not token or not email:
         print("Set LIBRO_PRIVATE_TOKEN and LIBRO_PRIVATE_EMAIL in .env first.")
         return 1
 
-    from yen_agent.reservation.libro_private import LibroPrivateReservationService
+    from resto_agent.reservation.libro_private import LibroPrivateReservationService
 
     svc = LibroPrivateReservationService(token=token, email=email, restaurant_id=rid)
     try:

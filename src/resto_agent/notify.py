@@ -103,7 +103,7 @@ def build_notifier() -> Notifier:
     Falling back is intentional: a misconfigured notifier must degrade to "still
     recorded, just not pushed", never to a crashed call.
     """
-    to_sms = os.environ.get("YEN_ALERT_SMS_TO", "")
+    to_sms = os.environ.get("AGENT_ALERT_SMS_TO", "")
     sid = os.environ.get("TWILIO_ACCOUNT_SID", "")
     token = os.environ.get("TWILIO_AUTH_TOKEN", "")
     from_sms = os.environ.get("TWILIO_FROM_NUMBER", "")
@@ -111,15 +111,15 @@ def build_notifier() -> Notifier:
         return SmsNotifier(account_sid=sid, auth_token=token,
                            from_number=from_sms, to_number=to_sms)
 
-    to_email = os.environ.get("YEN_ALERT_EMAIL_TO", "")
-    host = os.environ.get("YEN_SMTP_HOST", "")
+    to_email = os.environ.get("AGENT_ALERT_EMAIL_TO", "")
+    host = os.environ.get("AGENT_SMTP_HOST", "")
     if to_email and host:
         return EmailNotifier(
             host=host,
-            port=int(os.environ.get("YEN_SMTP_PORT", "587")),
-            user=os.environ.get("YEN_SMTP_USER", ""),
-            password=os.environ.get("YEN_SMTP_PASSWORD", ""),
-            sender=os.environ.get("YEN_SMTP_FROM", to_email),
+            port=int(os.environ.get("AGENT_SMTP_PORT", "587")),
+            user=os.environ.get("AGENT_SMTP_USER", ""),
+            password=os.environ.get("AGENT_SMTP_PASSWORD", ""),
+            sender=os.environ.get("AGENT_SMTP_FROM", to_email),
             recipient=to_email,
         )
 

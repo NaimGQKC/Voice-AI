@@ -14,7 +14,7 @@ from pathlib import Path
 
 from . import floorplan
 
-RESTAURANT_ID = "rest_yen_mtl"
+RESTAURANT_ID = "rest_demo_mtl"
 
 # Re-export party limits (defined by the physical room in floorplan.py).
 MIN_PARTY_SIZE = floorplan.MIN_PARTY_SIZE
@@ -90,7 +90,7 @@ class Database:
                 return
             self._conn.execute(
                 "INSERT INTO restaurants (id, name, locality, timezone) VALUES (?,?,?,?)",
-                (RESTAURANT_ID, "YEN Cuisine Japonaise", "Montreal", "America/Toronto"),
+                (RESTAURANT_ID, "Demo Bistro", "Montreal", "America/Toronto"),
             )
             for exp_id, name in floorplan.EXPERIENCES.items():
                 self._conn.execute(

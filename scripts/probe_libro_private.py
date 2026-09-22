@@ -24,7 +24,7 @@ Usage (credentials come from .env, never the command line):
 Required in .env:
     LIBRO_PRIVATE_TOKEN=...          # the Token value (treat like a password)
     LIBRO_PRIVATE_EMAIL=<your Libro login email>
-    LIBRO_PRIVATE_RESTAURANT_ID=8169
+    LIBRO_PRIVATE_RESTAURANT_ID=<redacted>
 """
 
 from __future__ import annotations
@@ -224,7 +224,7 @@ async def main() -> int:
 
     token = os.environ.get("LIBRO_PRIVATE_TOKEN", "")
     email = os.environ.get("LIBRO_PRIVATE_EMAIL", "")
-    restaurant_id = os.environ.get("LIBRO_PRIVATE_RESTAURANT_ID", "8169")
+    restaurant_id = os.environ.get("LIBRO_PRIVATE_RESTAURANT_ID", "<redacted>")
     if not token or not email:
         print("ERROR: LIBRO_PRIVATE_TOKEN and/or LIBRO_PRIVATE_EMAIL are not set.")
         _diagnose_env(found_env)

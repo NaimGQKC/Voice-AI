@@ -86,7 +86,7 @@ cancellation, and bridging phone calls in over SIP.
 
 **Alternatives:** Deepgram Aura-2, ElevenLabs, OpenAI, Azure, AWS Polly.
 
-**Why.** The greeting is French-only — *"Bonjour. YEN Cuisine Japonaise."* — at a venue where two-thirds of calls are in French. It has to sound like a French speaker said it. Cartesia `sonic-3` does, it is fast, and it bills **through LiveKit Inference on the LiveKit credentials the agent already needs**. That last part is the whole reason it won: no extra vendor account, no extra key to expire unattended. `YEN_TTS_PROVIDER` and `CARTESIA_API_KEY` are **not read by anything** — the routing is entirely `_has_livekit_cloud()` in `agent.py`.
+**Why.** The greeting is French-only — *"Bonjour. the restaurant."* — at a venue where two-thirds of calls are in French. It has to sound like a French speaker said it. Cartesia `sonic-3` does, it is fast, and it bills **through LiveKit Inference on the LiveKit credentials the agent already needs**. That last part is the whole reason it won: no extra vendor account, no extra key to expire unattended. `AGENT_TTS_PROVIDER` and `CARTESIA_API_KEY` are **not read by anything** — the routing is entirely `_has_livekit_cloud()` in `agent.py`.
 
 **Cost:** ~$50/1M chars. At this venue's ~90 talk-minutes/month that is under $2, so it does not move the economics.
 
@@ -174,7 +174,7 @@ restaurants with concurrent writers, revisit — that is the trigger, not taste.
 
 ---
 
-## The operator dashboard — built, `src/yen_agent/dashboard.py`
+## The operator dashboard — built, `src/resto_agent/dashboard.py`
 
 | Choice | What we did | Why |
 |---|---|---|
@@ -197,11 +197,11 @@ fool yourself.
 
 | Claim | Status |
 |---|---|
-| Booking against **real Libro**, real restaurant | ✅ **Proven.** Booking `111634069` created on `api.libroreserve.com` (restaurant 8169), requested 11:30 EDT returned as `2026-09-08T15:30:00Z` — exact — then cancelled and independently verified. |
+| Booking against **real Libro**, real restaurant | ✅ **Proven.** Booking `<redacted>` created on `api.libroreserve.com` (restaurant <redacted>), requested 11:30 EDT returned as `2026-09-08T15:30:00Z` — exact — then cancelled and independently verified. |
 | Conversation logic, dates, phone parsing, the cascade | ✅ Proven by 231 tests. |
 | **Voice in, tools out** | ✅ **Proven.** A spoken call reached `check_availability` with every argument correct (`party_size=2`, `part_of_day="dinner"`, `date="tomorrow"`, `preferred_time="seven"`). Voice was clear, the agent confirmed the details back, and language switching worked mid-call. |
 | **Voice → real Libro, end to end** | ❌ **NOT proven.** The live voice test above ran on the **default mock backend**, and the LLM hit a free-tier rate limit during it. Nobody has yet spoken to the agent while it wrote to `api.libroreserve.com`. That is `docs/QA_SCRIPT.md` section F, and it has not been run. **Do not claim this.** |
-| **Table merging / combining tables** | ❌ **NOT proven, and not real.** That runs on `mock_libro/floorplan.py`, an *invented* floor plan. Real Libro does its own seating; the live adapter never calls it and never returns `arrangement="merged"`. Do not cite the demo as evidence about YEN's dining room. |
+| **Table merging / combining tables** | ❌ **NOT proven, and not real.** That runs on `mock_libro/floorplan.py`, an *invented* floor plan. Real Libro does its own seating; the live adapter never calls it and never returns `arrangement="merged"`. Do not cite the demo as evidence about the venue's dining room. |
 | French-Canadian speech accuracy | ❌ Unvalidated. Chosen on reputation. `sonic-3` speaks European French. |
 | Latency under real phone conditions | ⚠️ **Measured, and over budget.** 1.16–1.48s to first token against 200–700ms. |
 | **The greeting-abandonment fix** | ❌ Unvalidated. We shortened the greeting on a theory about length and language; 19% zero-turn hangups is the number to beat and we have no A/B. |
