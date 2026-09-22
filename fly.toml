@@ -1,0 +1,64 @@
+# Fly.io deployment for the restaurant voice agent worker.
+#
+# Region is yyz (Toronto) — the only Canadian region among the hosts we
+# evaluated. Render and Railway have none. It is the shortest hop to a Montreal
+# phone line and to Supabase ca-central-1, and it keeps guest data in Canada,
+# which matters under Quebec's Law 25.
+#
+#   fly launch --no-deploy      # once, to create the app
+#   fly secrets set KEY=value   # see docs/DEPLOY.md for the full list
+#   fly deploy
+
+app = "resto-voice-agent"
+primary_region = "yyz"
+
+[build]
+
+[env]
+  AGENT_RESERVATION_BACKEND = "libro-private"
+  AGENT_LANGUAGE_MODE = "multi"
+  AGENT_LLM_PROVIDER = "google"
+
+[http_service]
+  # livekit-agents serves a health endpoint on 8081. Exposing it is what lets
+  # Fly notice a worker that is alive but wedged.
+  internal_port = 8081
+  force_https = true
+  auto_stop_machines = false   # NEVER stop. A stopped worker is a dead phone line.
+  auto_start_machines = true
+  min_machines_running = 1     # this is the "always warm" guarantee we are paying for
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "20s"
+    method = "GET"
+    path = "/"
+
+[[restart]]
+  # ⚠️ DO NOT CHANGE TO "on-failure".
+  #
+  # Fly's default restart policy is on-failure WITH A RETRY BUDGET. A crash loop
+  # exhausts the budget and Fly then stops restarting — leaving the restaurant's
+  # phone permanently dead, silently, with no alert. "always" has no budget.
+  policy = "always"
+
+[[vm]]
+  # Memory is the single biggest line on the Fly bill — far bigger than CPU.
+  # Checked against fly.io/calculator (1 machine, shared, 1 core, ord):
+  #
+  #     CPU (1 shared core)  $0.87 / month   flat
+  #     RAM                  $6.24 / month per GB
+  #
+  #     256mb  ->  $2.43     512mb  ->  $3.99     1gb  ->  $7.11
+  #
+  # So 1gb is ~$4.70/month more than 512mb. We pay it because the worker is
+  # Python + onnxruntime (bundled Silero VAD) and an OOM kill is a dead phone
+  # line, not a slow one. Turn detection itself is hosted on LiveKit Cloud, so
+  # no ONNX turn-detector weights are held locally.
+  #
+  # We have never measured real RSS. After a week live, read the memory graph
+  # in the Fly dashboard: if it sits under ~300MB, drop to 512mb and save the
+  # $4.70. Do not drop it before there is a graph to look at.
+  size = "shared-cpu-1x"
+  memory = "1gb"

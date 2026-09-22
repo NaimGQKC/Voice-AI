@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.Python
+
+# Test / tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Local data / secrets
+.env
+*.sqlite
+*.sqlite3
+*.db
+mock_libro_data/
+
+# Libro recon raw output — contains real customer data, never commit
+libro_recon_raw.json
+libro_recon_*.json
+
+# Browser HAR captures — contain the auth token AND customer data, never commit
+*.har
+libro_booking_truth.json
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
+LIVE_BOOKINGS_TO_DELETE.txt
+
+# Generated invoices — regenerate with `python invoices/build_invoice.py`.
+invoices/*.pdf
