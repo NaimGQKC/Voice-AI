@@ -1,7 +1,6 @@
 # YEN Cuisine Japonaise — bilingual voice AI phone agent
 
-A low-cost voice agent that answers the phone for **YEN Cuisine Japonaise**
-(2157 Rue Mackay, downtown Montreal) and handles reservations — check
+A low-cost voice agent that answers the phone for restaurant (I'm not naming my client) and handles reservations — check
 availability, book, look up, reschedule, cancel, answer FAQs, take messages and
 takeout callbacks. It **greets in French** and follows the caller into English
 if that's what they speak, switching mid-call if they do.
@@ -55,7 +54,7 @@ caller ─▶ LiveKit AgentSession (STT → LLM → TTS)
               ▼
        ReservationService  (ABC)
           ├── MockReservationService        ─▶ mock_libro (FastAPI + SQLite)
-          └── LibroPrivateReservationService ─▶ api.libroreserve.com (YEN, id 8169)
+          └── LibroPrivateReservationService ─▶ 
 ```
 
 ## Quick start
@@ -248,7 +247,7 @@ The things that break voice agents in practice are handled deterministically
 ## Phased plan
 
 - **Phase 1 (this repo):** free, web-tested agent against the mock. ✅
-- **Phase 2 — real reservations:** ✅ **in text mode.** Booking `111634069` was
+- **Phase 2 — real reservations:** ✅ **in text mode.** Booking `11189765` was
   created on `api.libroreserve.com` via `scripts/test_booking_libro.py`, dated
   far into the future, then cancelled and verified. **Nobody has yet *spoken* to
   the agent while it wrote to real Libro** — that is `docs/QA_SCRIPT.md` §F and
