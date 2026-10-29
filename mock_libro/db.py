@@ -170,6 +170,15 @@ class Database:
             (phone,),
         )
 
+    def all_bookings(self) -> list[sqlite3.Row]:
+        """Every booking with the guest's name and phone — for the demo view only."""
+        return self._all(
+            "SELECT b.id, b.time, b.size, b.status, b.table_ids, b.note, b.locale,"
+            " p.first_name, p.last_name, p.phone"
+            " FROM bookings b LEFT JOIN people p ON p.id = b.person_id"
+            " ORDER BY CAST(b.id AS INTEGER) DESC"
+        )
+
     def confirmed_bookings_on_date(
         self, restaurant_id: str, date: str, *, exclude_id: str = ""
     ) -> list[sqlite3.Row]:

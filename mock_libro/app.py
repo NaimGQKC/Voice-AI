@@ -5,7 +5,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 
 from . import db as dbmod
 from . import floorplan
@@ -116,6 +116,18 @@ def create_app(db_path: str = ":memory:", *, seed: bool = True) -> FastAPI:
 
     app = FastAPI(title="Mock Libro Reserve API", version="v2", lifespan=lifespan)
     app.state.db = db
+
+    # -- demo view ---------------------------------------------------------
+    # A live reservation book, so a recording can show a booking appear while
+    # the caller is still talking. Mock data only — this never exists on real
+    # Libro, and nothing here is part of the Libro-shaped API above.
+    @app.get("/demo/bookings.json")
+    def demo_bookings():
+        return JSONResponse([dict(r) for r in db.all_bookings()])
+
+    @app.get("/demo/book", response_class=HTMLResponse)
+    def demo_book():
+        return HTMLResponse(_DEMO_PAGE)
 
     # -- restaurants -------------------------------------------------------
     @app.get("/restricted/restaurants")
@@ -334,3 +346,61 @@ def create_app(db_path: str = ":memory:", *, seed: bool = True) -> FastAPI:
 
 
 app = create_app(":memory:", seed=True)
+
+
+_DEMO_PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reservation book (mock)</title>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--ink:#1a1a19;--dim:#6b6b68;--rule:#e2e0da;
+--accent:#1f3864;--ok:#1a7f4b;--bad:#b4231a;--flash:#e6f4ec}
+@media (prefers-color-scheme:dark){:root{--bg:#161615;--card:#1f1f1e;--ink:#f1f0ec;
+--dim:#9a9a95;--rule:#32322f;--accent:#8fb0ee;--ok:#5fcf97;--bad:#ff8a80;--flash:#173826}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);
+font:16px/1.4 system-ui,-apple-system,Segoe UI,sans-serif;padding:24px}
+.wrap{max-width:860px;margin:0 auto}
+h1{margin:0 0 4px;font-size:22px}
+.sub{color:var(--dim);font-size:13px;margin-bottom:18px}
+.badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;
+padding:2px 8px;border-radius:99px;border:1px solid var(--rule);color:var(--dim);margin-left:8px;vertical-align:middle}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);text-align:left;
+padding:10px 14px;border-bottom:1px solid var(--rule)}
+td{padding:12px 14px;border-bottom:1px solid var(--rule);font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+.st{font-weight:700;font-size:13px}.confirmed{color:var(--ok)}.cancelled{color:var(--bad)}
+.new{animation:flash 2.4s ease-out}
+@keyframes flash{from{background:var(--flash)}to{background:transparent}}
+.empty{padding:34px;text-align:center;color:var(--dim)}
+.live{color:var(--ok);font-size:12px;margin-top:12px}
+.live:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;
+background:var(--ok);margin-right:6px;animation:p 1.2s infinite}
+@keyframes p{50%{opacity:.25}}
+</style></head><body><div class="wrap">
+<h1>Reservation book<span class="badge">MOCK DATA</span></h1>
+<div class="sub">The reservation system the agent is talking to. Nothing here is real.</div>
+<div class="card"><table><thead><tr><th>#</th><th>Guest</th><th>Party</th><th>Date &amp; time</th>
+<th>Status</th></tr></thead><tbody id="rows"></tbody></table>
+<div class="empty" id="empty">No bookings yet.</div></div>
+<div class="live">live &middot; refreshing</div></div>
+<script>
+const seen=new Set();let first=true;
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function when(t){try{return new Date(t).toLocaleString("en-CA",{weekday:"short",month:"short",day:"numeric",
+hour:"numeric",minute:"2-digit"})}catch(e){return t}}
+async function tick(){
+  try{
+    const r=await fetch("/demo/bookings.json",{cache:"no-store"});const d=await r.json();
+    document.getElementById("empty").style.display=d.length?"none":"block";
+    document.getElementById("rows").innerHTML=d.map(b=>{
+      const isNew=!first&&!seen.has(b.id+b.status);
+      return `<tr class="${isNew?"new":""}"><td>${esc(b.id)}</td>
+      <td>${esc((b.first_name||"")+" "+(b.last_name||"")).trim()||"&mdash;"}</td>
+      <td>${esc(b.size)}</td><td>${esc(when(b.time))}</td>
+      <td class="st ${esc(b.status)}">${esc(b.status)}</td></tr>`}).join("");
+    d.forEach(b=>seen.add(b.id+b.status));first=false;
+  }catch(e){}
+}
+tick();setInterval(tick,700);
+</script></body></html>"""
