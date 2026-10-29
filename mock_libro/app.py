@@ -348,7 +348,7 @@ def create_app(db_path: str = ":memory:", *, seed: bool = True) -> FastAPI:
 app = create_app(":memory:", seed=True)
 
 
-_DEMO_PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
+_DEMO_PAGE = r"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Reservation book (mock)</title>
 <style>
@@ -387,15 +387,24 @@ background:var(--ok);margin-right:6px;animation:p 1.2s infinite}
 <script>
 const seen=new Set();let first=true;
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function when(t){try{return new Date(t).toLocaleString("en-CA",{weekday:"short",month:"short",day:"numeric",
-hour:"numeric",minute:"2-digit"})}catch(e){return t}}
+// Show the restaurant's wall-clock time exactly as stored ("...T19:00:00-04:00" -> 7:00 PM).
+// Never go through new Date(t): that would re-express it in the VIEWER'S timezone and
+// show 11:00 PM on any machine that is not in Montreal.
+function when(t){
+  const m=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(t||"");
+  if(!m)return t;
+  const d=new Date(Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5]));
+  return d.toLocaleString("en-CA",{timeZone:"UTC",weekday:"short",month:"short",day:"numeric",
+    hour:"numeric",minute:"2-digit"});
+}
+const shortId=id=>String(id||"").replace(/^booking_/,"").slice(0,6);
 async function tick(){
   try{
     const r=await fetch("/demo/bookings.json",{cache:"no-store"});const d=await r.json();
     document.getElementById("empty").style.display=d.length?"none":"block";
     document.getElementById("rows").innerHTML=d.map(b=>{
       const isNew=!first&&!seen.has(b.id+b.status);
-      return `<tr class="${isNew?"new":""}"><td>${esc(b.id)}</td>
+      return `<tr class="${isNew?"new":""}"><td>${esc(shortId(b.id))}</td>
       <td>${esc((b.first_name||"")+" "+(b.last_name||"")).trim()||"&mdash;"}</td>
       <td>${esc(b.size)}</td><td>${esc(when(b.time))}</td>
       <td class="st ${esc(b.status)}">${esc(b.status)}</td></tr>`}).join("");

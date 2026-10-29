@@ -66,7 +66,7 @@ covered without any cloud services or the heavy agent runtime:
 
 ```bash
 pip install -e ".[dev]"
-pytest -q          # 231 tests: mock JSON:API, service round-trips, dates, phones, concierge, resilience
+pytest -q          # 234 tests: mock JSON:API, service round-trips, dates, phones, concierge, resilience
 ```
 
 ### 2. Run the mock Libro server (optional — tests use it in-process)
@@ -312,7 +312,7 @@ src/resto_agent/
   notify.py            # staff alerts (SMS / email) for messages and failures
   config.py            # env-driven settings
 scripts/               # demo, setup check, call log CLI, Libro probes, client report
-tests/                 # 231 tests, run with no cloud services and no API keys
+tests/                 # 234 tests, run with no cloud services and no API keys
 docs/owner_questions.xlsx  # questions for the restaurant owner (hand this off)
 ```
 

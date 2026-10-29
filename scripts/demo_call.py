@@ -67,7 +67,7 @@ def _wait_for(url: str, seconds: float = 12.0) -> bool:
     deadline = time.monotonic() + seconds
     while time.monotonic() < deadline:
         try:
-            with urllib.request.urlopen(url, timeout=1) as r:  # noqa: S310 - localhost
+            with urllib.request.urlopen(url, timeout=1) as r:
                 if r.status == 200:
                     return True
         except OSError:

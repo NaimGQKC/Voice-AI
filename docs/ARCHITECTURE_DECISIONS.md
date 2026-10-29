@@ -198,7 +198,7 @@ fool yourself.
 | Claim | Status |
 |---|---|
 | Booking against **real Libro**, real restaurant | ✅ **Proven.** Booking `<redacted>` created on `api.libroreserve.com` (restaurant <redacted>), requested 11:30 EDT returned as `2026-09-08T15:30:00Z` — exact — then cancelled and independently verified. |
-| Conversation logic, dates, phone parsing, the cascade | ✅ Proven by 231 tests. |
+| Conversation logic, dates, phone parsing, the cascade | ✅ Proven by 234 tests. |
 | **Voice in, tools out** | ✅ **Proven.** A spoken call reached `check_availability` with every argument correct (`party_size=2`, `part_of_day="dinner"`, `date="tomorrow"`, `preferred_time="seven"`). Voice was clear, the agent confirmed the details back, and language switching worked mid-call. |
 | **Voice → real Libro, end to end** | ❌ **NOT proven.** The live voice test above ran on the **default mock backend**, and the LLM hit a free-tier rate limit during it. Nobody has yet spoken to the agent while it wrote to `api.libroreserve.com`. That is `docs/QA_SCRIPT.md` section F, and it has not been run. **Do not claim this.** |
 | **Table merging / combining tables** | ❌ **NOT proven, and not real.** That runs on `mock_libro/floorplan.py`, an *invented* floor plan. Real Libro does its own seating; the live adapter never calls it and never returns `arrangement="merged"`. Do not cite the demo as evidence about the venue's dining room. |
@@ -213,7 +213,7 @@ fool yourself.
 
 1. **We're on a reverse-engineered private API.** Libro's official partner route never responded, so we integrate against the dashboard's own undocumented API. It can change without notice. Mitigated by isolating it behind one adapter, but it's the biggest business risk.
 2. **French-Canadian speech accuracy is unvalidated.** We chose the STT on reputation, not local evidence, and the TTS voice is European French.
-3. **No conversation-level tests.** 231 tests prove the *logic*; nothing proves the *conversation*. The SDK ships the tooling; we haven't used it. `docs/QA_SCRIPT.md` is the manual stand-in and has not been fully worked through.
+3. **No conversation-level tests.** 234 tests prove the *logic*; nothing proves the *conversation*. The SDK ships the tooling; we haven't used it. `docs/QA_SCRIPT.md` is the manual stand-in and has not been fully worked through.
 4. **Soft dependency on LiveKit Cloud** — hosted turn detection and the Cartesia voice both route through it. Without LiveKit credentials the agent falls back to VAD turn-taking and Deepgram's English voice.
 5. **Latency is over budget** — 1.16–1.48s to first token — and prompt caching isn't firing. Both measured, neither fixed.
 6. **Cost honesty:** verified recurring cost is **~$20 CAD/month** against the incumbent's **~$275 CAD/month**. That is a real saving, but it excludes maintenance, which is currently unpriced because it's being done for free. **The durable justification is control and data ownership** — the restaurant owns the prompts, the logic, and the call records. Lead with that, and let the cost number support it rather than carry it.

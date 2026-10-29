@@ -47,7 +47,7 @@ safe even if your `.env` contains the real token.
 | 0:25–0:40 | Language switch | Answer in **English**: *"Yes, 7 works — name's Alex, number is 514-555-0142."* Agent follows you and reads the number back |
 | 0:40–0:48 | **Booking row appears and flashes green** | Agent confirms. This is the shot the whole video is for |
 | 0:48–0:56 | Row turns red: `cancelled` | *"Actually, can you cancel that?"* — the incumbent system could not do this |
-| 0:56–1:00 | End card | *"231 tests · FR/EN · swappable reservation backend"* |
+| 0:56–1:00 | End card | *"234 tests · FR/EN · swappable reservation backend"* |
 
 **Reality check on timing.** A natural booking is closer to 70–90 seconds live,
 because each turn carries about 1.3 seconds of model latency. Record the full
@@ -74,7 +74,7 @@ Always keep a clean recording of one good call as a backup before any live demo.
 ## What to claim, and what not to
 
 Say: *"It holds a real spoken conversation, books and cancels through a reservation
-API, and I tested it against 231 cases including the failure modes."*
+API, and I tested it against 234 cases including the failure modes."*
 
 Do not say it is deployed or answering a phone number — it is not. And do not say
 it has been joined end-to-end to a real restaurant's live system by voice: the

@@ -129,3 +129,51 @@ def test_payment_intent_initialize():
     attrs = r.json()["data"]["attributes"]
     assert attrs["amount"] == 5000
     assert attrs["payment-url"].startswith("https://")
+
+
+# ---------------------------------------------------------------------------
+# The demo reservation book (/demo/book)
+# ---------------------------------------------------------------------------
+# A recording shows this page next to the terminal, so what it shows has to be
+# right, not merely present. The first version converted each booking time into
+# the VIEWER'S timezone and showed a 7:00 PM booking as 11:00 PM on any machine
+# that was not in Montreal; nothing on the data side could have caught that.
+
+
+def _book(c: TestClient, *, time: str, size: int = 2, phone: str = "+15145550142"):
+    return c.post("/restricted/restaurant/bookings", json={"data": {"attributes": {
+        "size": size, "time": time, "first-name": "Alex", "phone": phone}}})
+
+
+def test_demo_feed_lists_a_booking_made_through_the_api_then_its_cancellation():
+    c = client()
+    assert c.get("/demo/bookings.json").json() == []
+
+    r = _book(c, time=slot_time(future_date(3), "19:00"))
+    assert r.status_code == 201, r.text
+    rows = c.get("/demo/bookings.json").json()
+    assert [(b["first_name"], b["size"], b["status"]) for b in rows] == [("Alex", 2, "confirmed")]
+
+    bid = r.json()["data"]["id"]
+    assert c.delete(f"/restricted/restaurant/bookings/{bid}").status_code in (200, 204)
+    rows = c.get("/demo/bookings.json").json()
+    # Cancelled, not deleted: the row has to stay so the page can show it turning red.
+    assert [b["status"] for b in rows] == ["cancelled"]
+
+
+def test_demo_feed_keeps_the_restaurants_own_wall_clock_time():
+    """The stored offset-qualified time is passed through untouched for the page to
+    read as wall-clock. Re-expressing it in UTC here would reintroduce the bug."""
+    c = client()
+    t = slot_time(future_date(3), "19:00")
+    assert _book(c, time=t).status_code == 201
+    assert c.get("/demo/bookings.json").json()[0]["time"] == t
+
+
+def test_demo_page_is_clearly_labelled_mock_and_never_uses_the_viewers_timezone():
+    page = client().get("/demo/book").text
+    assert "MOCK DATA" in page
+    # Times must be read from the string, not via new Date(isoString). Comments are
+    # excluded: the page explains this very pitfall in one.
+    code = "\n".join(ln for ln in page.splitlines() if not ln.lstrip().startswith("//"))
+    assert "new Date(t)" not in code
